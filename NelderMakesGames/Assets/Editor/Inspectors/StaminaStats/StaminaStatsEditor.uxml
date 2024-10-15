@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:Label tabindex="-1" text="Stamina Stats" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Label" style="font-size: 32px; -unity-font-style: bold; align-self: flex-start; justify-content: center; align-items: auto; flex-direction: row; color: rgb(136, 255, 131);" />
+    <ui:VisualElement class="Header-Divider" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/ATK_Voxel_Engine/Sprites/Pixel.png?fileID=2800000&amp;guid=37691d69bd7aee54894170dc948ede79&amp;type=3#Pixel&quot;); height: 15px; flex-basis: 10px; min-width: 0; min-height: 0; max-width: none; max-height: 43px; flex-shrink: 0; -unity-background-image-tint-color: rgb(136, 255, 131);" />
+    <ui:SliderInt label="Starting" high-value="500" binding-path="_starting" show-input-field="true" tooltip="The default stamina value" name="StartingSlider" style="width: auto; -unity-font-style: normal; white-space: normal; -unity-text-align: upper-left; flex-direction: column; flex-basis: auto;" />
+    <ui:SliderInt label="Max" high-value="1000" show-input-field="true" binding-path="_max" name="MaxSlider" style="width: auto; flex-direction: column;" />
+    <ui:Slider label="Tick Rate" high-value="100" binding-path="_tickRate" show-input-field="true" style="width: auto; flex-direction: column;" />
+    <ui:Slider label="Regen /t" high-value="100" binding-path="_regenPerTick" show-input-field="true" style="width: auto; flex-direction: column;" />
+    <ui:Slider label="Regen Delay /s" high-value="100" binding-path="_regenDelay" show-input-field="true" class="SliderStyle" style="width: auto; flex-direction: column; right: auto;" />
+</ui:UXML>

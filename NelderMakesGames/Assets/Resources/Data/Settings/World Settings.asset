@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22bdb55e4130fba4ea8edf72b1a74148, type: 3}
+  m_Name: World Settings
+  m_EditorClassIdentifier: 
+  chunkPrefab: {fileID: 6213556336917049060, guid: 64d6ce9c2c521614a88117d437c3dae6,
+    type: 3}
+  chunkSize: 16
+  renderDistanceInChunks: 4
+  worldHeight: 29
+  seed: 5
+  chunkTickRate: 1
+  heightNoise: {fileID: 11400000, guid: 7123f36e818c008439e9c843194f18b4, type: 2}

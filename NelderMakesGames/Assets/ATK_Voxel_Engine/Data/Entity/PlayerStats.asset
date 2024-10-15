@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da9a655c5b8b9e439c24df92d95185d, type: 3}
+  m_Name: PlayerStats
+  m_EditorClassIdentifier: 
+  _staminaStats: {fileID: 11400000, guid: ff666e66c8bc10148a659e4e1b4010f3, type: 2}
+  _motion: {fileID: 11400000, guid: fe426ab51386d594599e7eb71ae72fda, type: 2}
+  _breakSpeed: 0.1
+  _placeSpeed: 0.1
+  _height: 2

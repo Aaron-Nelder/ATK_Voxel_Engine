@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1ba485ed55e9174f8332343ab457139, type: 3}
+  m_Name: Debug Settings
+  m_EditorClassIdentifier: 
+  showEditorInGameMode: 1
+  editorShowFPS: 0
+  editorShowActiveChunks: 0
+  editorShowPlayerChunk: 1
+  editorShowPlayerPos: 1
+  editorShowCameraChunk: 1
+  editorShowCameraPos: 1
+  editorShowCPUTime: 1
+  editorShowGPUTime: 1
+  editorShowBatches: 1
+  gameShowFPS: 1
+  gameShowPlayerChunk: 1
+  gameShowPlayerPos: 1
+  gameShowActiveChunks: 1
+  gameShowActiveVoxels: 1
+  gameShowCPUTime: 1
+  gameShowGPUTime: 1
+  gameShowBatches: 1
+  camChunkBorder:
+    enabled: 0
+    previewType: 3
+    color: {r: 0.1452893, g: 1, b: 0, a: 1}
+  playerChunkBorder:
+    enabled: 0
+    previewType: 2
+    color: {r: 0, g: 1, b: 0.83348227, a: 1}
+  debugLinePrefab: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
+    type: 3}
