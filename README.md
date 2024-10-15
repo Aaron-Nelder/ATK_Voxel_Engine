@@ -1,2 +1,2 @@
-# ATK_Voxel_Engine
-A voxel engine build using unity as the base
+# ATK_VoxelEngine
+A voxel engine built using the unity game engine as a base
