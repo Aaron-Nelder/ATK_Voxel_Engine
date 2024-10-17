@@ -72,7 +72,6 @@ public class Chunk : MonoBehaviour
         SetUpMesh();
 #endif
 
-
         VoxelManager.OnChunkTick += Tick;
         return this;
     }
@@ -103,14 +102,7 @@ public class Chunk : MonoBehaviour
         int worldHeight = worldSettings.worldHeight;
         int offsetX = Position.x * worldSettings.chunkSize;
         int offsetZ = Position.z * worldSettings.chunkSize;
-
-#if UNITY_EDITOR
-        BenchmarkManager.Bench(() =>  heightNoise = NoiseGenerator.GetNoiseMap(worldSettings.seed, chunkSize, worldSettings.HeightNoise.MagClamp, worldSettings.HeightNoise.Octaves, worldSettings.HeightNoise.Persistence, worldSettings.HeightNoise.Lacunarity, new Vector2(offsetX, offsetZ), worldHeight)
-, $"Getting Height Noise:{Position}");
-#endif
-#if UNITY_STANDALONE
         heightNoise = NoiseGenerator.GetNoiseMap(worldSettings.seed, chunkSize, worldSettings.HeightNoise.MagClamp, worldSettings.HeightNoise.Octaves, worldSettings.HeightNoise.Persistence, worldSettings.HeightNoise.Lacunarity, new Vector2(offsetX, offsetZ), worldHeight);
-#endif
         //caveNoise = NoiseGenerator.GenerateCaveMap(chunkSize, worldHeight, chunkSize, new Vector2(offsetX, offsetZ));
 
         for (int x = 0; x < chunkSize; x++)
