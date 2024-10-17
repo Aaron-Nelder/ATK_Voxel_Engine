@@ -58,20 +58,20 @@ public class UpdateManager : MonoBehaviour
 
     void Update()
     {
-        foreach (var updatable in updates)
-            updatable.Update(Time.deltaTime);
+        for (int i = 0; i < updates.Count; i++)
+            updates[i].Update(Time.deltaTime);
     }
 
     void FixedUpdate()
     {
-        foreach (var updatable in fixedUpdates)
-            updatable.Update(Time.fixedDeltaTime);
+        for(int i = 0; i < fixedUpdates.Count; i++)
+            fixedUpdates[i].Update(Time.fixedDeltaTime);
     }
 
     void LateUpdate()
     {
-        foreach (var updatable in lateUpdates)
-            updatable.Update(Time.deltaTime);
+        for (int i = 0; i < lateUpdates.Count; i++)
+            lateUpdates[i].Update(Time.fixedDeltaTime);
     }
 }
 

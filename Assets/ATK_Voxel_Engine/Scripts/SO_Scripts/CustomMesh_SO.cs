@@ -82,7 +82,7 @@ public class CustomMesh_SO : ScriptableObject
 
     public void GetVisibles(ChunkPosition chunkPos, Vector3Int voxelPosition, out List<Vector3> vertices, out List<int> indices, out List<Vector2> UVs, out List<Vector3> normals)
     {
-        int topologyOffset = meshTopology == MeshTopology.Quads ? 4 : 6;
+        int topologyOffset = meshTopology == MeshTopology.Quads ? 4 : 3;
         Plane[] visiblePlanes = GetVisiblePlanes(chunkPos, voxelPosition);
 
         vertices = new List<Vector3>();

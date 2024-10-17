@@ -47,7 +47,7 @@ public static class DebugHelper
         {
             if (Camera.current is null)
                 return lastKnowCameraChunk;
-            
+
             Vector3 cameraPos = Camera.current.transform.position;
             int chunkSize = VoxelManager.WorldSettings.chunkSize;
             lastKnowCameraChunk = new ChunkPosition(Mathf.FloorToInt(cameraPos.x / chunkSize), Mathf.FloorToInt(cameraPos.z / chunkSize));
@@ -93,8 +93,9 @@ public static class DebugHelper
     {
         get
         {
-#if UNITY_EDITOR
-            return UnityEditor.UnityStats.batches;
+            long val = -1;
+#if UNITY_EDITORs
+            val = UnityEditor.UnityStats.batches;
 #endif
 #if UNITY_STANDALONE
 
@@ -104,9 +105,9 @@ public static class DebugHelper
                 capturingBatches = true;
             }
 
-            return batchesRecorder.LastValue;
+            val = batchesRecorder.LastValue;
 #endif
-            return -1;
+            return val;
         }
     }
 

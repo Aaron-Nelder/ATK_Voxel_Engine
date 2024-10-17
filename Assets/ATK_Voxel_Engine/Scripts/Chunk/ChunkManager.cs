@@ -33,7 +33,7 @@ public static class ChunkManager
         chunkParent = parent;
         Dispose(isEditor);
 
-        GenerateChunksAtOrigin();        
+        GenerateChunksAtOrigin();
 
         AllChunksListening = true;
         InvokeOnLoadForAllChunks();
@@ -45,10 +45,19 @@ public static class ChunkManager
     {
         if (Chunks.ContainsKey(pos)) return;
 
+#if UNITY_EDITOR
+        BenchmarkManager.Bench(() => InitChunk(pos, listening), $"Instantiating Chunk:{pos}");
+#endif
+#if UNITY_STANDALONE
+        InitChunk(pos, listening);
+#endif
+    }
+
+    static void InitChunk(ChunkPosition pos, bool listening = true)
+    {
         GameObject chunkObj = GameObject.Instantiate(ChunkPrefab, WorldHelper.ChunkPosToWorldPos(pos), Quaternion.identity, chunkParent);
         chunkObj.name = $"Chunk: ({pos.x},{pos.z})";
         Chunk chunk = chunkObj.GetComponent<Chunk>().Init(pos, listening);
-        OnChunkLoaded?.Invoke(chunk);
     }
 
     static void InvokeOnLoadForAllChunks()
@@ -82,13 +91,13 @@ public static class ChunkManager
             if (newDir.x == 0)
             {
                 int z = newDir.z > 0 ? newDir.z - 1 : newDir.z + 1;
-                Chunks[new(playerChunk.x + row, playerChunk.z + z)].MarkDirty();
+                //Chunks[new(playerChunk.x + row, playerChunk.z + z)].MarkDirty();
                 GenerateChunk(new(playerChunk.x + row, playerChunk.z + newDir.z));
             }
             else
             {
                 int x = newDir.x > 0 ? newDir.x - 1 : newDir.x + 1;
-                Chunks[new(playerChunk.x + x, playerChunk.z + row)].MarkDirty();
+                //Chunks[new(playerChunk.x + x, playerChunk.z + row)].MarkDirty();
                 GenerateChunk(new(playerChunk.x + newDir.x, playerChunk.z + row));
             }
         }
@@ -116,8 +125,8 @@ public static class ChunkManager
             else
                 Chunks[new(playerChunk.x + dir.x, playerChunk.z + row)].Dispose();
         }
-        
-        
+
+
         // Updates the row in the direction of the player from the row that was disposed
         for (int row = -halfRenderDistance; row < halfRenderDistance + 1; row++)
         {
@@ -132,8 +141,8 @@ public static class ChunkManager
                 Chunks[pos].ChunkRenderer.RefreshBorderVoxels(Chunks[pos]);
             }
         }
-        
-        
+
+
     }
 
     // Disposes of all chunks

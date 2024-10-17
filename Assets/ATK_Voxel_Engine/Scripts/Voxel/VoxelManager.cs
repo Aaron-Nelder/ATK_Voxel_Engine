@@ -34,13 +34,13 @@ public class VoxelManager : MonoBehaviour
     }
 
     //Atlas
-    static Dictionary<uint, VoxelData_SO>voxelAtlas = null;
-    public static Dictionary<uint,VoxelData_SO> VoxelAtlas
+    static Dictionary<uint, VoxelData_SO> voxelAtlas = null;
+    public static Dictionary<uint, VoxelData_SO> VoxelAtlas
     {
         get
         {
             if (voxelAtlas is null)
-                voxelAtlas = Resources.LoadAll<VoxelData_SO>(VOXEL_DATA_PATH).ToDictionary( x => x.Id);
+                voxelAtlas = Resources.LoadAll<VoxelData_SO>(VOXEL_DATA_PATH).ToDictionary(x => x.Id);
 
             return voxelAtlas;
         }
@@ -71,9 +71,13 @@ public class VoxelManager : MonoBehaviour
 
     static float chunkTick = 0;
 
+    [SerializeField] ScreenLogger screenLogger;
+
     void Awake()
     {
         Instance = this;
+        screenLogger.Init();
+
         if (!GatherSO())
             return;
 
@@ -96,6 +100,8 @@ public class VoxelManager : MonoBehaviour
     void FixedUpdate()
     {
         ChunkTick();
+
+        if (ScreenLogger.Instance == null) return;
     }
 
     void ChunkTick()

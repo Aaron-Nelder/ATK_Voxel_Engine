@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Unity.Jobs;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -65,7 +65,13 @@ public class Chunk : MonoBehaviour
 
         AssignVoxels(VoxelManager.WorldSettings);
 
+#if UNITY_EDITOR
+        BenchmarkManager.Bench(() => SetUpMesh(), $"Setting up Mesh:{Position}");
+#endif
+#if UNITY_STANDALONE
         SetUpMesh();
+#endif
+
 
         VoxelManager.OnChunkTick += Tick;
         return this;
@@ -78,7 +84,6 @@ public class Chunk : MonoBehaviour
         Mesh = new Mesh();
         Mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         Mesh.MarkDynamic();
-        Mesh.Optimize();
         Filter.sharedMesh = Mesh;
         Collider.sharedMesh = Mesh;
 
@@ -99,7 +104,13 @@ public class Chunk : MonoBehaviour
         int offsetX = Position.x * worldSettings.chunkSize;
         int offsetZ = Position.z * worldSettings.chunkSize;
 
+#if UNITY_EDITOR
+        BenchmarkManager.Bench(() =>  heightNoise = NoiseGenerator.GetNoiseMap(worldSettings.seed, chunkSize, worldSettings.HeightNoise.MagClamp, worldSettings.HeightNoise.Octaves, worldSettings.HeightNoise.Persistence, worldSettings.HeightNoise.Lacunarity, new Vector2(offsetX, offsetZ), worldHeight)
+, $"Getting Height Noise:{Position}");
+#endif
+#if UNITY_STANDALONE
         heightNoise = NoiseGenerator.GetNoiseMap(worldSettings.seed, chunkSize, worldSettings.HeightNoise.MagClamp, worldSettings.HeightNoise.Octaves, worldSettings.HeightNoise.Persistence, worldSettings.HeightNoise.Lacunarity, new Vector2(offsetX, offsetZ), worldHeight);
+#endif
         //caveNoise = NoiseGenerator.GenerateCaveMap(chunkSize, worldHeight, chunkSize, new Vector2(offsetX, offsetZ));
 
         for (int x = 0; x < chunkSize; x++)
@@ -197,7 +208,12 @@ public class Chunk : MonoBehaviour
                 ChunkManager.Chunks[chunkPos].ChunkRenderer.AddVoxelFace(ChunkManager.Chunks[chunkPos], checkPos, -dir);
         }
 
+#if UNITY_EDITOR
+        BenchmarkManager.Bench(() => IsDirty = !ChunkRenderer.ApplyData(Filter, Collider), $"Destroying Voxel:{localPos}");
+#endif
+#if UNITY_STANDALONE
         IsDirty = !ChunkRenderer.ApplyData(Filter, Collider);
+#endif
     }
 
     public void PlaceVoxel(Vector3Int voxelPos, uint id)
@@ -251,7 +267,7 @@ public class Chunk : MonoBehaviour
         // If the chunk is a neighbour of the loaded chunk, update the visible blocks
         if (chunk.Position.x + 1 == Position.x || chunk.Position.x - 1 == Position.x || chunk.Position.z + 1 == Position.z || chunk.Position.z - 1 == Position.z)
         {
-            if (IsDirty)
+            //if (IsDirty)
             {
                 ChunkRenderer.RefreshBorderVoxels(this);
                 //ChunkRenderer.RefreshVisibleVoxels(this);

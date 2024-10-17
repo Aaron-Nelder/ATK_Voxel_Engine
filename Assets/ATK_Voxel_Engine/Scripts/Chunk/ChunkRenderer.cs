@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Jobs;
-using UnityEngine.UIElements;
 
 public struct ChunkRenderer
 {
@@ -12,18 +11,18 @@ public struct ChunkRenderer
     //NativeHashMap<Vector3Int, NativeList<Vector2>> uvs;
     //NativeHashMap<Vector3Int, NativeList<Vector3>> normals;
 
-    Dictionary<Vector3Int, List<Vector3>> vertices;
-    Dictionary<Vector3Int, List<int>> indices;
-    Dictionary<Vector3Int, List<Vector2>> uvs;
-    Dictionary<Vector3Int, List<Vector3>> normals;
+    Dictionary<Vector3Int, List<Vector3>> _vertices;
+    Dictionary<Vector3Int, List<int>> _indices;
+    Dictionary<Vector3Int, List<Vector2>> _uvs;
+    Dictionary<Vector3Int, List<Vector3>> _normals;
 
     // Initalizes the renderer with the given chunk
     public ChunkRenderer(Chunk chunk)
     {
-        vertices = new Dictionary<Vector3Int, List<Vector3>>();
-        indices = new Dictionary<Vector3Int, List<int>>();
-        uvs = new Dictionary<Vector3Int, List<Vector2>>();
-        normals = new Dictionary<Vector3Int, List<Vector3>>();
+        _vertices = new Dictionary<Vector3Int, List<Vector3>>();
+        _indices = new Dictionary<Vector3Int, List<int>>();
+        _uvs = new Dictionary<Vector3Int, List<Vector2>>();
+        _normals = new Dictionary<Vector3Int, List<Vector3>>();
         InitalizeDictionary(chunk);
         RefreshVisibleVoxels(chunk);
     }
@@ -33,10 +32,10 @@ public struct ChunkRenderer
     {
         foreach (var v in chunk.Voxels)
         {
-            vertices.Add(v.Key, new());
-            indices.Add(v.Key, new());
-            uvs.Add(v.Key, new());
-            normals.Add(v.Key, new());
+            _vertices.Add(v.Key, new());
+            _indices.Add(v.Key, new());
+            _uvs.Add(v.Key, new());
+            _normals.Add(v.Key, new());
         }
     }
 
@@ -63,12 +62,12 @@ public struct ChunkRenderer
     public bool ApplyData(MeshFilter filter, MeshCollider collider)
     {
         List<Vector3> vertValues = new List<Vector3>();
-        foreach (var b in vertices)
+        foreach (var b in _vertices)
             vertValues.AddRange(b.Value);
 
         int vertOffset = 0;
         List<int> indicesValues = new List<int>();
-        foreach (var b in indices)
+        foreach (var b in _indices)
         {
             foreach (var i in b.Value)
                 indicesValues.Add(i + vertOffset);
@@ -76,11 +75,11 @@ public struct ChunkRenderer
         }
 
         List<Vector2> uvValues = new List<Vector2>();
-        foreach (var b in uvs)
+        foreach (var b in _uvs)
             uvValues.AddRange(b.Value);
 
         List<Vector3> normValues = new List<Vector3>();
-        foreach (var b in normals)
+        foreach (var b in _normals)
             normValues.AddRange(b.Value);
 
         filter.sharedMesh.Clear();
@@ -91,7 +90,6 @@ public struct ChunkRenderer
         filter.sharedMesh.RecalculateBounds();
 
         collider.sharedMesh = filter.sharedMesh;
-
         return true;
     }
 
@@ -99,8 +97,13 @@ public struct ChunkRenderer
     {
         if (chunk.Voxels[position] == 0) return;
         VoxelData_SO data = VoxelManager.GetVoxelData(chunk.Voxels[position]);
+
+        if (!data.MeshData.IsVisible(chunk.Position, position)) return;
+
         data.MeshData.GetVisibles(chunk.Position, position, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<Vector3> normals);
+
         AddData(chunk, position, vertices, indices, data.ScaledUVs(uvs), normals);
+
         if (refreshMesh)
             ApplyData(chunk.Filter, chunk.Collider);
     }
@@ -118,20 +121,20 @@ public struct ChunkRenderer
     // Removes the given block from the mesh data
     public void RemoveData(Chunk chunk, Vector3Int pos)
     {
-        vertices[pos].Clear();
-        indices[pos].Clear();
-        uvs[pos].Clear();
-        normals[pos].Clear();
+        _vertices[pos].Clear();
+        _indices[pos].Clear();
+        _uvs[pos].Clear();
+        _normals[pos].Clear();
         chunk.MarkDirty();
     }
 
     void AddData(Chunk chunk, Vector3Int pos, List<Vector3> vertices, List<int> indices, List<Vector2> uvs, List<Vector3> normals)
     {
-        this.vertices[pos].AddRange(vertices);
+        this._vertices[pos].AddRange(vertices);
         foreach (var i in indices)
-            this.indices[pos].Add(i + this.vertices[pos].Count - vertices.Count);
-        this.uvs[pos].AddRange(uvs);
-        this.normals[pos].AddRange(normals);
+            this._indices[pos].Add(i + this._vertices[pos].Count - vertices.Count);
+        this._uvs[pos].AddRange(uvs);
+        this._normals[pos].AddRange(normals);
         chunk.MarkDirty();
     }
 }

@@ -81,13 +81,4 @@ public class RightHand : MonoBehaviour
         if (!_isRightClick)
             _animator.SetBool(_breakingHash, false);
     }
-
-    void OnDrawGizmos()
-    {
-        if (Selector.IsSelecting)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawCube(Selector.SelectedVoxel.NormalWorldPos, Vector3.one);
-        }
-    }
 }
