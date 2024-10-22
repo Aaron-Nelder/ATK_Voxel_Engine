@@ -1,11 +1,14 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Combined_Material", menuName = DebugHelper.MENU_NAME + "/Combined_Material")]
-public class CombinedMaterial_SO : ScriptableObject
+namespace ATKVoxelEngine
 {
-    [SerializeField] Material material;
-    public Material Material => material;
+    [CreateAssetMenu(fileName = "Combined_Material", menuName = EngineConstants.ENGINE_NAME + "/Combined_Material")]
+    public class CombinedMaterial_SO : ScriptableObject
+    {
+        [SerializeField] Material material;
+        public Material Material => material;
 
-    [SerializeField] int gridSize;
-    public int GridSize => gridSize;
+        [SerializeField] int gridSize;
+        public int GridSize => gridSize;
+    }
 }

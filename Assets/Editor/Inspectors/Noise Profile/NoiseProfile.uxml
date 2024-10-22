@@ -1,11 +1,16 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <ui:Label tabindex="-1" text="Noise Profile" parse-escape-sequences="true" display-tooltip-when-elided="true" binding-path="Name" name="Header" style="font-size: 32px; -unity-font-style: bold; align-self: flex-start; align-items: auto; flex-direction: row; color: rgb(255, 131, 184);" />
-    <ui:VisualElement class="Header-Divider" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/ATK_Voxel_Engine/Sprites/Pixel.png?fileID=2800000&amp;guid=37691d69bd7aee54894170dc948ede79&amp;type=3#Pixel&quot;); height: 15px; flex-basis: 10px; min-width: 0; min-height: 0; max-width: none; max-height: 43px; flex-shrink: 0; color: rgba(255, 255, 255, 0); background-color: rgb(255, 131, 184); -unity-background-image-tint-color: rgb(255, 131, 184);" />
-    <ui:Slider label="Scale" high-value="500" binding-path="scale" low-value="0" show-input-field="true" style="flex-direction: column;" />
-    <ui:Slider label="Amplitude" high-value="5" binding-path="amplitude" show-input-field="true" style="flex-direction: column;" />
-    <ui:Slider label="Frequency" high-value="1" binding-path="frequency" show-input-field="true" style="flex-direction: column;" />
-    <ui:SliderInt label="Octaves" high-value="10" binding-path="octaves" show-input-field="true" style="flex-direction: column;" />
-    <ui:Slider label="Lacunarity" high-value="10" binding-path="lacunarity" style="flex-direction: column;" />
-    <ui:Slider label="Persistence" high-value="10" binding-path="persistence" show-input-field="true" style="flex-direction: column;" />
-    <ui:SliderInt label="MagClamp" high-value="500" show-input-field="true" binding-path="magClamp" style="flex-direction: column;" />
+    <ui:VisualElement class="Header-Divider" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/ATK_Voxel_Engine/Sprites/UI/Pixel.png?fileID=2800000&amp;guid=37691d69bd7aee54894170dc948ede79&amp;type=3#Pixel&quot;); height: 15px; flex-basis: 10px; min-width: 0; min-height: 0; max-width: none; max-height: 43px; flex-shrink: 0; color: rgba(255, 255, 255, 0); background-color: rgb(255, 131, 184); -unity-background-image-tint-color: rgb(255, 131, 184);" />
+    <ui:Slider label="Scale" high-value="500" binding-path="_scale" low-value="0" show-input-field="true" style="flex-direction: column;" />
+    <ui:Slider label="Amplitude" high-value="5" binding-path="_amplitude" show-input-field="true" style="flex-direction: column;" />
+    <ui:Slider label="Frequency" high-value="1" binding-path="_frequency" show-input-field="true" style="flex-direction: column;" />
+    <ui:SliderInt label="Octaves" high-value="10" binding-path="_octaves" show-input-field="true" style="flex-direction: column;" />
+    <ui:Slider label="Lacunarity" high-value="10" binding-path="_lacunarity" show-input-field="true" style="flex-direction: column;" />
+    <ui:Slider label="Persistence" high-value="10" binding-path="_persistance" show-input-field="true" style="flex-direction: column;" />
+    <ui:SliderInt label="MagClamp" high-value="500" show-input-field="true" binding-path="_magClamp" style="flex-direction: column;" />
+    <ui:Toggle label="Use Threshold" binding-path="_useThreshold" toggle-on-label-click="true" value="false" name="Threshold" />
+    <ui:VisualElement style="flex-grow: 1; flex-direction: row; justify-content: flex-start; align-items: stretch; align-content: stretch; align-self: stretch; flex-wrap: nowrap;">
+        <ui:Vector2Field binding-path="_threshold" focusable="true" enabled="true" name="ThresholdLabel" style="flex-direction: row; align-items: center; align-self: auto; align-content: auto; flex-shrink: 1; flex-grow: 0; flex-wrap: nowrap; justify-content: space-evenly; width: 25%;" />
+        <ui:MinMaxSlider value="0,5" low-limit="0" high-limit="5" name="ThresholdSlider" binding-path="_threshold" enabled="true" style="align-content: auto; align-items: auto; flex-direction: row; flex-shrink: 0; flex-grow: 1;" />
+    </ui:VisualElement>
 </ui:UXML>

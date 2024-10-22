@@ -1,0 +1,30 @@
+.ObjectField {
+    flex-direction: column;
+    width: auto;
+    align-self: stretch;
+}
+
+.HorizontalGroup {
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: auto;
+    align-content: stretch;
+    align-self: stretch;
+    flex-basis: auto;
+    flex-wrap: wrap;
+}
+
+.ObjectField {
+    flex-direction: column;
+    width: auto;
+    align-self: stretch;
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: flex-start;
+    font-size: 14px;
+    -unity-font-style: bold-and-italic;
+    -unity-text-align: middle-left;
+    white-space: normal;
+    text-overflow: ellipsis;
+}

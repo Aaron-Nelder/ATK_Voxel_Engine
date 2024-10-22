@@ -1,5 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/ATK_Voxel_Engine/uxml/uss/NormalLog.uss?fileID=7433441132597879392&amp;guid=c3fe28d070518c349ad3c0f8869079cd&amp;type=3#NormalLog" />
-    <Style src="project://database/Assets/ATK_Voxel_Engine/uxml/uss/ScreenLogContainer.uss?fileID=7433441132597879392&amp;guid=9d4c9078d7b18534daff40180c83afd7&amp;type=3#ScreenLogContainer" />
-    <ui:VisualElement name="LogContainer" class="Container" style="transition-property: opacity; transition-duration: 1s; transition-timing-function: ease; transition-delay: 0s; display: flex; -unity-background-image-tint-color: rgba(0, 0, 0, 0.49); border-left-color: rgba(0, 0, 0, 0.61); border-right-color: rgba(0, 0, 0, 0.61); border-top-color: rgba(0, 0, 0, 0.61); border-bottom-color: rgba(0, 0, 0, 0.61); opacity: 0;" />
-</ui:UXML>

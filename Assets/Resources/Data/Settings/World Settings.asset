@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22bdb55e4130fba4ea8edf72b1a74148, type: 3}
   m_Name: World Settings
   m_EditorClassIdentifier: 
-  chunkPrefab: {fileID: 6213556336917049060, guid: 64d6ce9c2c521614a88117d437c3dae6,
+  _chunkPrefab: {fileID: 6213556336917049060, guid: 64d6ce9c2c521614a88117d437c3dae6,
     type: 3}
-  chunkSize: 16
-  renderDistanceInChunks: 4
-  worldHeight: 29
-  seed: 5
-  chunkTickRate: 1
-  heightNoise: {fileID: 11400000, guid: 7123f36e818c008439e9c843194f18b4, type: 2}
+  _chunkSize: {x: 8, y: 128, z: 8}
+  _renderDistance: 4
+  _seed: 0
+  _chunkTickRate: 1000
+  _heightNoise: {fileID: 11400000, guid: 7123f36e818c008439e9c843194f18b4, type: 2}
+  _caveNoise: {fileID: 11400000, guid: 187ab8501b29a1f4e9ffa7bb8db8aa5a, type: 2}

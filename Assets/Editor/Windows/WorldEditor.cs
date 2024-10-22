@@ -1,158 +1,157 @@
-using System;
 using UnityEditor;
-using UnityEditor.TerrainTools;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
-public class WorldEditor : EditorWindow
+namespace ATKVoxelEngine
 {
-    WorldSettings_SO WorldSettings => VoxelManager.WorldSettings;
-    DebugSettings_SO DebugSettings => VoxelManager.DebugSettings;
-    [SerializeField] VisualTreeAsset visualTree = default;
-
-    enum Menus { WorldSettings = 0, DebugUI = 1, Preview = 2, MeshCreator = 3 }
-    ToolbarButton[] toolbarButtons = new ToolbarButton[4];
-    VisualElement[] menus = new VisualElement[4];
-
-    CustomMesh_SO previewMesh;
-    GameObject spawnedMesh;
-
-    [MenuItem("Window/UI Toolkit/WorldEditor")]
-    public static void ShowExample()
+    public class WorldEditor : EditorWindow
     {
-        WorldEditor wnd = GetWindow<WorldEditor>();
-        wnd.titleContent = new GUIContent("WorldEditor");
-    }
+        WorldSettings_SO WorldSettings => VoxelManager.WorldSettings;
+        DebugSettings_SO DebugSettings => VoxelManager.DebugSettings;
+        [SerializeField] VisualTreeAsset visualTree = default;
 
-    public void CreateGUI()
-    {
-        // Instantiate UXML
-        VisualElement uxml = visualTree.Instantiate();
-        rootVisualElement.Add(uxml);
+        enum Menus { WorldSettings = 0, DebugUI = 1, Preview = 2, MeshCreator = 3 }
+        ToolbarButton[] toolbarButtons = new ToolbarButton[4];
+        VisualElement[] menus = new VisualElement[4];
 
-        GetMenuButtons();
-        GetMenus();
-        SetMenu(0);
-    }
+        CustomMesh_SO previewMesh;
+        GameObject spawnedMesh;
 
-    void GetMenuButtons()
-    {
-        toolbarButtons[(int)Menus.WorldSettings] = rootVisualElement.Q<ToolbarButton>("WorldSettingsButton");
-        toolbarButtons[(int)Menus.WorldSettings].clicked += () => { SetMenu((int)Menus.WorldSettings); };
-        toolbarButtons[(int)Menus.DebugUI] = rootVisualElement.Q<ToolbarButton>("DebugUIButton");
-        toolbarButtons[(int)Menus.DebugUI].clicked += () => { SetMenu((int)Menus.DebugUI); };
-        toolbarButtons[(int)Menus.Preview] = rootVisualElement.Q<ToolbarButton>("PreviewButton");
-        toolbarButtons[(int)Menus.Preview].clicked += () => { SetMenu((int)Menus.Preview); };
-        toolbarButtons[(int)Menus.MeshCreator] = rootVisualElement.Q<ToolbarButton>("MeshCreatorButton");
-        toolbarButtons[(int)Menus.MeshCreator].clicked += () => { SetMenu((int)Menus.MeshCreator); };
-    }
-
-    void GetMenus()
-    {
-        if (WorldSettings != null)
+        [MenuItem(EngineConstants.ENGINE_EDITOR_WINDOW_PATH)]
+        public static void ShowExample()
         {
-            // Spawn the world settings menu
-            WorldSettingsEditor worldSettingsEditor = ScriptableObject.CreateInstance<WorldSettingsEditor>();
-            menus[(int)Menus.WorldSettings] = worldSettingsEditor.CreateInspectorGUI();
-            worldSettingsEditor.InitElements(WorldSettings);
-            menus[(int)Menus.WorldSettings].Bind(new SerializedObject(WorldSettings));
-            rootVisualElement.Add(menus[(int)Menus.WorldSettings]);
+            WorldEditor wnd = GetWindow<WorldEditor>();
+            wnd.titleContent = new GUIContent("WorldEditor");
         }
 
-        if (DebugSettings != null)
+        public void CreateGUI()
         {
-            DebugSettingsEditor debugSettingsEditor = ScriptableObject.CreateInstance<DebugSettingsEditor>();
-            menus[(int)Menus.DebugUI] = debugSettingsEditor.CreateInspectorGUI();
-            debugSettingsEditor.InitElements(DebugSettings);
-            menus[(int)Menus.DebugUI].Bind(new SerializedObject(DebugSettings));
-            rootVisualElement.Add(menus[(int)Menus.DebugUI]);
+            // Instantiate UXML
+            VisualElement uxml = visualTree.Instantiate();
+            rootVisualElement.Add(uxml);
+
+            GetMenuButtons();
+            GetMenus();
+            SetMenu(0);
         }
 
-        menus[(int)Menus.Preview] = rootVisualElement.Q<VisualElement>("Preview");
-        rootVisualElement.Q<Button>("PreviewChunk").clicked += () => { ChunkManager.PreviewChunkEditor(DebugHelper.CameraChunk); };
-        rootVisualElement.Q<Button>("UnloadPreviewChunk").clicked += () =>
+        void GetMenuButtons()
         {
-            GameObject[] loadedChunks = GameObject.FindGameObjectsWithTag("Chunk");
-            foreach (var chunk in loadedChunks)
-                DestroyImmediate(chunk);
+            toolbarButtons[(int)Menus.WorldSettings] = rootVisualElement.Q<ToolbarButton>("WorldSettingsButton");
+            toolbarButtons[(int)Menus.WorldSettings].clicked += () => { SetMenu((int)Menus.WorldSettings); };
+            toolbarButtons[(int)Menus.DebugUI] = rootVisualElement.Q<ToolbarButton>("DebugUIButton");
+            toolbarButtons[(int)Menus.DebugUI].clicked += () => { SetMenu((int)Menus.DebugUI); };
+            toolbarButtons[(int)Menus.Preview] = rootVisualElement.Q<ToolbarButton>("PreviewButton");
+            toolbarButtons[(int)Menus.Preview].clicked += () => { SetMenu((int)Menus.Preview); };
+            toolbarButtons[(int)Menus.MeshCreator] = rootVisualElement.Q<ToolbarButton>("MeshCreatorButton");
+            toolbarButtons[(int)Menus.MeshCreator].clicked += () => { SetMenu((int)Menus.MeshCreator); };
+        }
 
-            ChunkManager.Dispose(true);
-        };
-
-        rootVisualElement.Q<Button>("SaveMesh").clicked += () =>
+        void GetMenus()
         {
-            previewMesh = rootVisualElement.Q<ObjectField>("CustomMesh").value as CustomMesh_SO;
-            Mesh mesh = previewMesh.SaveMesh();
-        };
-
-        rootVisualElement.Q<Button>("PreviewMesh").clicked += () =>
-        {
-            if (spawnedMesh is null)
+            if (WorldSettings != null)
             {
-                Selection.activeGameObject = MeshCreator.SpawnMesh(rootVisualElement.Q<ObjectField>("CustomMesh").value as CustomMesh_SO, rootVisualElement.Q<ObjectField>("MeshMaterial").value as Material);
+                // Spawn the world settings menu
+                WorldSettingsEditor worldSettingsEditor = ScriptableObject.CreateInstance<WorldSettingsEditor>();
+                menus[(int)Menus.WorldSettings] = worldSettingsEditor.CreateInspectorGUI();
+                worldSettingsEditor.InitElements(WorldSettings);
+                menus[(int)Menus.WorldSettings].Bind(new SerializedObject(WorldSettings));
+                rootVisualElement.Add(menus[(int)Menus.WorldSettings]);
             }
-            else if (!MeshCreator.DestroyMesh())
+
+            if (DebugSettings != null)
             {
-                DestroyImmediate(spawnedMesh);
+                DebugSettingsEditor debugSettingsEditor = ScriptableObject.CreateInstance<DebugSettingsEditor>();
+                menus[(int)Menus.DebugUI] = debugSettingsEditor.CreateInspectorGUI();
+                debugSettingsEditor.InitElements(DebugSettings);
+                menus[(int)Menus.DebugUI].Bind(new SerializedObject(DebugSettings));
+                rootVisualElement.Add(menus[(int)Menus.DebugUI]);
             }
-        };
 
-        menus[(int)Menus.MeshCreator] = rootVisualElement.Q<VisualElement>("MeshCreator");
-    }
+            menus[(int)Menus.Preview] = rootVisualElement.Q<VisualElement>("Preview");
+            rootVisualElement.Q<Button>("PreviewChunk").clicked += () => { ChunkManager.PreviewChunkEditor(DebugHelper.CameraChunk); };
+            rootVisualElement.Q<Button>("UnloadPreviewChunk").clicked += () =>
+            {
+                ChunkManager.Dispose(true);
 
-    bool subbed = false;
-    void SetMenu(int index)
-    {
-        if (index == (int)Menus.MeshCreator)
-        {
-            SceneView.duringSceneGui += OnSceneGUI;
-            subbed = true;
+                GameObject[] loadedChunks = GameObject.FindGameObjectsWithTag("Chunk");
+                foreach (var chunk in loadedChunks)
+                    DestroyImmediate(chunk);
+            };
+
+            rootVisualElement.Q<Button>("SaveMesh").clicked += () =>
+            {
+                previewMesh = rootVisualElement.Q<ObjectField>("CustomMesh").value as CustomMesh_SO;
+                Mesh mesh = previewMesh.SaveMesh();
+            };
+
+            rootVisualElement.Q<Button>("PreviewMesh").clicked += () =>
+            {
+                if (spawnedMesh is null)
+                {
+                    Selection.activeGameObject = MeshCreator.SpawnMesh(rootVisualElement.Q<ObjectField>("CustomMesh").value as CustomMesh_SO, rootVisualElement.Q<ObjectField>("MeshMaterial").value as Material);
+                }
+                else if (!MeshCreator.DestroyMesh())
+                {
+                    DestroyImmediate(spawnedMesh);
+                }
+            };
+
+            menus[(int)Menus.MeshCreator] = rootVisualElement.Q<VisualElement>("MeshCreator");
         }
-        else if (subbed)
+
+        bool subbed = false;
+        void SetMenu(int index)
+        {
+            if (index == (int)Menus.MeshCreator)
+            {
+                SceneView.duringSceneGui += OnSceneGUI;
+                subbed = true;
+            }
+            else if (subbed)
+            {
+                SceneView.duringSceneGui -= OnSceneGUI;
+                subbed = false;
+            }
+
+            for (int i = 0; i < menus.Length; i++)
+            {
+                if (menus[i] == null) continue;
+                if (i == index)
+                    menus[i].style.display = DisplayStyle.Flex;
+                else
+                    menus[i].style.display = DisplayStyle.None;
+
+
+            }
+        }
+
+        void SaveMesh(Mesh mesh, string endName = "")
+        {
+            AssetDatabase.CreateAsset(mesh, "Assets/Minecraft/Meshes/" + previewMesh.meshName + endName + ".asset");
+            EditorUtility.SetDirty(previewMesh);
+            AssetDatabase.SaveAssets();
+        }
+
+        private void OnGUI()
+        {
+            spawnedMesh = GameObject.FindGameObjectWithTag("Mesh Preview");
+            string buttonLabel = spawnedMesh ? "Destroy Preview Mesh" : "Preview Mesh";
+
+            Button previewMeshbttn = rootVisualElement.Q<Button>("PreviewMesh");
+            if (previewMeshbttn is not null)
+                previewMeshbttn.text = buttonLabel;
+        }
+
+        void OnSceneGUI(SceneView view)
+        {
+            MeshCreator.Tick();
+        }
+
+        private void OnDestroy()
         {
             SceneView.duringSceneGui -= OnSceneGUI;
-            subbed = false;
-        }
-
-        for (int i = 0; i < menus.Length; i++)
-        {
-            if (menus[i] == null) continue;
-            if (i == index)
-                menus[i].style.display = DisplayStyle.Flex;
-            else
-                menus[i].style.display = DisplayStyle.None;
-
-
         }
     }
-
-    void SaveMesh(Mesh mesh, string endName = "")
-    {
-        AssetDatabase.CreateAsset(mesh, "Assets/Minecraft/Meshes/" + previewMesh.meshName + endName + ".asset");
-        EditorUtility.SetDirty(previewMesh);
-        AssetDatabase.SaveAssets();
-    }
-
-    private void OnGUI()
-    {
-        spawnedMesh = GameObject.FindGameObjectWithTag("Mesh Preview");
-        string buttonLabel = spawnedMesh ? "Destroy Preview Mesh" : "Preview Mesh";
-
-        Button previewMeshbttn = rootVisualElement.Q<Button>("PreviewMesh");
-        if (previewMeshbttn is not null)
-            previewMeshbttn.text = buttonLabel;
-    }
-
-    void OnSceneGUI(SceneView view)
-    {
-        MeshCreator.Tick();
-    }
-
-    private void OnDestroy()
-    {
-        SceneView.duringSceneGui -= OnSceneGUI;
-    }
-
 }

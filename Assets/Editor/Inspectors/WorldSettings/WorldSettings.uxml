@@ -1,19 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <ui:Template name="NoiseProfile" src="project://database/Assets/Editor/Inspectors/Noise%20Profile/NoiseProfile.uxml?fileID=9197481963319205126&amp;guid=ee15c90ceab0a3e49926d654223cf64a&amp;type=3#NoiseProfile" />
-    <ui:ScrollView horizontal-scroller-visibility="Hidden" vertical-page-size="-1" style="flex-shrink: 0; flex-direction: column; overflow: visible; flex-wrap: nowrap; align-items: center; min-height: auto; max-height: none; justify-content: center; align-self: center;">
-        <ui:Label tabindex="-1" text="World Settings" parse-escape-sequences="true" display-tooltip-when-elided="true" style="font-size: 32px; -unity-font-style: bold; align-self: flex-start; align-items: auto; flex-direction: row; color: rgb(255, 200, 90);" />
-        <ui:VisualElement class="Header-Divider" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/ATK_Voxel_Engine/Sprites/Pixel.png?fileID=2800000&amp;guid=37691d69bd7aee54894170dc948ede79&amp;type=3#Pixel&quot;); height: 15px; flex-basis: 10px; min-width: 0; min-height: 0; max-width: none; max-height: 43px; flex-shrink: 0; color: rgba(255, 255, 255, 0); background-color: rgb(255, 200, 90); -unity-background-image-tint-color: rgb(255, 200, 90);" />
-        <ui:VisualElement style="flex-grow: 1; flex-direction: row; justify-content: flex-start; align-items: flex-start;">
-            <uie:ObjectField label="Chunk Prefab" name="ChunkPrefab" allow-scene-objects="false" binding-path="chunkPrefab" style="flex-direction: column; width: auto;" />
-            <uie:ObjectField label="HeightNoise" name="HeightNoise" allow-scene-objects="false" binding-path="heightNoise" style="flex-direction: column; width: auto;" />
-        </ui:VisualElement>
-        <ui:SliderInt label="Chunk Size /v" high-value="64" low-value="4" show-input-field="true" binding-path="chunkSize" style="flex-direction: column;" />
-        <ui:SliderInt label="Render Distance /c" high-value="128" low-value="4" show-input-field="true" binding-path="renderDistanceInChunks" style="flex-direction: column;" />
-        <ui:SliderInt label="World Height /v" high-value="256" low-value="1" show-input-field="true" binding-path="worldHeight" style="flex-direction: column;" />
-        <ui:VisualElement style="flex-grow: 1; flex-direction: row; justify-content: flex-start;">
-            <ui:FloatField label="Chunk Tick Rate /s" value="42.2" binding-path="chunkTickRate" style="flex-direction: column; width: 200px; align-items: flex-start;" />
-            <ui:IntegerField label="Seed" value="42" binding-path="seed" style="flex-direction: column; justify-content: flex-start; align-items: flex-start; width: 200px; flex-wrap: nowrap;" />
-        </ui:VisualElement>
-        <ui:Instance template="NoiseProfile" name="HeightNoisePage" />
-    </ui:ScrollView>
+    <Style src="project://database/Assets/Editor/Inspectors/WorldSettings/WorldSettings.uss?fileID=7433441132597879392&amp;guid=b6875bc87d828ef418c356cfd24b6b4f&amp;type=3#WorldSettings" />
+    <ui:Label tabindex="-1" text="World Settings" parse-escape-sequences="true" display-tooltip-when-elided="true" style="font-size: 32px; -unity-font-style: bold; align-self: flex-start; align-items: auto; flex-direction: row; color: rgb(255, 200, 90);" />
+    <ui:VisualElement class="Header-Divider" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/ATK_Voxel_Engine/Sprites/UI/Pixel.png?fileID=2800000&amp;guid=37691d69bd7aee54894170dc948ede79&amp;type=3#Pixel&quot;); height: 15px; flex-basis: 10px; min-width: 0; min-height: 0; max-width: none; max-height: 43px; flex-shrink: 0; color: rgba(255, 255, 255, 0); background-color: rgb(255, 200, 90); -unity-background-image-tint-color: rgb(255, 200, 90);" />
+    <ui:VisualElement name="Object_Fields" class="HorizontalGroup">
+        <uie:ObjectField label="Chunk Prefab" name="ChunkPrefab" allow-scene-objects="false" binding-path="_chunkPrefab" data-source-type="UnityEngine.GameObject, UnityEngine.CoreModule" type="UnityEngine.GameObject, UnityEngine.CoreModule" value="project://database/Assets/ATK_Voxel_Engine/Prefabs/Chunk.prefab?fileID=6213556336917049060&amp;guid=64d6ce9c2c521614a88117d437c3dae6&amp;type=3#Chunk" class="ObjectField" />
+        <uie:ObjectField label="HeightNoise" name="HeightNoise" allow-scene-objects="false" binding-path="_heightNoise" type="ATKVoxelEngine.NoiseProfile_SO, ATKVoxelEngine" class="ObjectField" style="flex-direction: column; width: auto; align-self: stretch;" />
+        <uie:ObjectField label="CaveNoise" name="CaveNoise" allow-scene-objects="false" binding-path="_caveNoise" type="ATKVoxelEngine.NoiseProfile_SO, ATKVoxelEngine" class="ObjectField" style="flex-direction: column; width: auto; align-self: stretch;" />
+    </ui:VisualElement>
+    <ui:Vector3IntField label="Chunk Size /v" binding-path="_chunkSize" name="ChunkSize" style="margin-top: 17px; margin-right: 3px; margin-bottom: 3px; margin-left: 3px;" />
+    <ui:SliderInt label="Render Distance /c" high-value="128" low-value="4" show-input-field="true" name="RenderDistance" binding-path="_renderDistance" style="flex-direction: column;" />
+    <ui:SliderInt label="Chunk Tick Rate /ms" value="1000" high-value="10000" binding-path="_chunkTickRate" name="ChunkTickRate" show-input-field="true" style="flex-direction: column;" />
+    <ui:IntegerField label="Seed" value="1" binding-path="_seed" max-length="2147483647" style="flex-direction: column; flex-grow: 1; flex-shrink: 1; align-items: stretch; min-width: auto; min-height: auto; align-content: stretch; width: initial; max-width: none;" />
 </ui:UXML>
