@@ -3,11 +3,9 @@ using System.Collections;
 using UnityEngine;
 using System.Threading.Tasks;
 using System;
-using UnityEngine.LowLevelPhysics;
 
 namespace ATKVoxelEngine
 {
-
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(MeshCollider))]
@@ -15,7 +13,7 @@ namespace ATKVoxelEngine
     {
         public ChunkPosition Position { get; private set; }
         public Vector3Int WorldPosition { get; private set; }
-        public bool IsDirty { get; private set; } = true;
+        public bool IsDirty { get; set; } = true;
         public ChunkRenderer ChunkRenderer { get; private set; }
 
         // Voxels
@@ -25,7 +23,7 @@ namespace ATKVoxelEngine
         [field: SerializeField] public MeshFilter Filter { get; private set; }
         [field: SerializeField] public MeshRenderer Renderer { get; private set; }
         [field: SerializeField] public MeshCollider Collider { get; private set; }
-        public Mesh Mesh { get; private set; }
+        Mesh _mesh;
 
         bool isListening = false;
         public bool IsListening
@@ -44,7 +42,6 @@ namespace ATKVoxelEngine
             }
         }
 
-        public void MarkDirty() => IsDirty = true;
         public bool Initialized { get; private set; }
 
         //Noisess
@@ -102,7 +99,7 @@ namespace ATKVoxelEngine
             IsListening = listen;
             Position = position;
             WorldPosition = WorldHelper.ChunkPosToWorldPos(Position);
-            WorldSettings_SO settings = VoxelManager.WorldSettings;
+            WorldSettings_SO settings = EngineSettings.WorldSettings;
             FillChunk(settings);
             GetNoise(settings);
             AssignVoxels(settings);
@@ -116,11 +113,12 @@ namespace ATKVoxelEngine
             OnDebugging(DebugHelper.Debugging);
             SetUpMesh();
             Initialized = true;
-            VoxelManager.OnChunkTick += Tick;
+            GameManager.OnChunkTick += Tick;
+            ChunkManager.OnChunkLoaded?.Invoke(Position);
 
             //TODO:: REMOVE THIS AND CHECK INSTEAD IF THE CHUNK IS AT 0,0, AND THE WORLD IS BEING GENEREATED ON STARTUP
             if (Position == ChunkPosition.Zero)
-                VoxelManager.OnCenterChunkInit();
+                GameManager.OnCenterChunkInit();
         }
 
         // Fills all voxels with air
@@ -136,24 +134,24 @@ namespace ATKVoxelEngine
         void GetNoise(WorldSettings_SO worldSettings)
         {
             _heightNoise = NoiseGenerator.GetNoise2D(worldSettings, worldSettings.HeightNoise, WorldPosition.x, WorldPosition.z);
-            _caveNoise = NoiseGenerator.GetNoise3D(worldSettings, worldSettings.CaveNoise, WorldPosition.x, WorldPosition.z);
+            //_caveNoise = NoiseGenerator.GetNoise3D(worldSettings, worldSettings.CaveNoise, WorldPosition.x, WorldPosition.z);
         }
 
         void SetUpMesh()
         {
-            Renderer.material = VoxelManager.MaterialAtlas[0].Material; // TODO:: set proper material
-            Mesh = new Mesh();
-            Mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-            Mesh.MarkDynamic();
-            Filter.sharedMesh = Mesh;
-            Collider.sharedMesh = Mesh;
-            ChunkRenderer.ApplyData(Filter, Collider, () => IsDirty = false);
+            Renderer.material = EngineSettings.MaterialAtlas[0].Material; // TODO:: set proper material
+            _mesh = new Mesh();
+            _mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+            _mesh.MarkDynamic();
+            Filter.sharedMesh = _mesh;
+            Collider.sharedMesh = _mesh;
+            ChunkRenderer.ApplyData(this);
         }
 
         void Tick()
         {
             if (IsDirty)
-                ChunkRenderer.ApplyData(Filter, Collider, () => IsDirty = false);
+                ChunkRenderer.ApplyData(this);
         }
 
         void AssignVoxels(WorldSettings_SO worldSettings)
@@ -175,132 +173,31 @@ namespace ATKVoxelEngine
         // returns the block ID for the given position
         uint GetVoxelId(Vector3Int pos, int surfaceHeight)
         {
-            int caveHeight = _caveNoise[pos.x, pos.y, pos.z];
+            //int caveHeight = _caveNoise[pos.x, pos.y, pos.z];
 
-            bool isVoxel = caveHeight != 0;
+            //bool isVoxel = caveHeight != 0;
 
             // BEDROCK
             if (pos.y == 0)
                 return 2;
 
-            if (surfaceHeight - pos.y < 3 && isVoxel)
+            if (surfaceHeight - pos.y < 3) //&& isVoxel)
                 return 1;
 
-            return (uint)caveHeight * 2;
+            return 2;//(uint)caveHeight * 2;
         }
 
-        // Sets the given voxel to air and surounding voxels to display their proper faces
-        public void DestroyVoxel(Vector3Int voxelPos)
-        {
-            if (!Initialized) return;
-
-            int chunkSizeX = VoxelManager.WorldSettings.ChunkSize.x;
-            int chunkSizeY = VoxelManager.WorldSettings.ChunkSize.y;
-            int chunkSizeZ = VoxelManager.WorldSettings.ChunkSize.z;
-
-            if (!WorldHelper.VoxelInBounds(voxelPos.y, chunkSizeY)) return;
-
-            // sets the current voxel to air at the given world position
-            ChunkRenderer.ClearData(this, voxelPos);
-            Voxels[voxelPos] = 0;
-
-            // loops through all directions and adds the new visible faces to the surrounding voxels
-            foreach (var dir in WorldHelper.Directions)
-            {
-                Vector3Int checkPos = voxelPos + dir;
-                ChunkPosition chunkPos = Position;
-
-                // If the voxel position is not in the chunk increase the chunk position
-                if (checkPos.x < 0)
-                {
-                    chunkPos.x--;
-                    checkPos.x += chunkSizeX;
-                }
-                else if (checkPos.x >= chunkSizeX)
-                {
-                    chunkPos.x++;
-                    checkPos.x -= chunkSizeX;
-                }
-
-                if (checkPos.z < 0)
-                {
-                    chunkPos.z--;
-                    checkPos.z += chunkSizeZ;
-                }
-                else if (checkPos.z >= chunkSizeZ)
-                {
-                    chunkPos.z++;
-                    checkPos.z -= chunkSizeZ;
-                }
-
-                if (WorldHelper.VoxelInBounds(checkPos.y, chunkSizeY))
-                    ChunkManager.Chunks[chunkPos].ChunkRenderer.AddVoxelFace(ChunkManager.Chunks[chunkPos], checkPos, -dir);
-            }
-
-            ChunkRenderer.ApplyData(Filter, Collider, () => IsDirty = false);
-        }
-
-        public void PlaceVoxel(Vector3Int voxelPos, uint id)
-        {
-            if (!Initialized) return;
-
-            int chunkSizeX = VoxelManager.WorldSettings.ChunkSize.x;
-            int chunkSizeY = VoxelManager.WorldSettings.ChunkSize.y;
-            int chunkSizeZ = VoxelManager.WorldSettings.ChunkSize.z;
-
-            if (!WorldHelper.VoxelInBounds(voxelPos.y, chunkSizeY)) return;
-
-            Voxels[voxelPos] = id;
-            ChunkRenderer.AddVisibleFaces(this, voxelPos);
-
-            // loops through all directions and adds the new visible faces to the surrounding voxels
-            foreach (var dir in WorldHelper.Directions)
-            {
-                Vector3Int checkPos = voxelPos + dir;
-                ChunkPosition chunkPos = Position;
-
-                // if the voxel position is not in the chunk increase the chunk position
-                if (checkPos.x < 0)
-                {
-                    chunkPos.x--;
-                    checkPos.x += chunkSizeX;
-                }
-                else if (checkPos.x >= chunkSizeX)
-                {
-                    chunkPos.x++;
-                    checkPos.x -= chunkSizeX;
-                }
-
-                if (checkPos.z < 0)
-                {
-                    chunkPos.z--;
-                    checkPos.z += chunkSizeZ;
-                }
-                else if (checkPos.z >= chunkSizeZ)
-                {
-                    chunkPos.z++;
-                    checkPos.z -= chunkSizeZ;
-                }
-
-                if (WorldHelper.VoxelInBounds(checkPos.y, chunkSizeY))
-                    ChunkManager.Chunks[chunkPos].ChunkRenderer.AddVisibleFaces(ChunkManager.Chunks[chunkPos], checkPos);
-            }
-
-            ChunkRenderer.ApplyData(Filter, Collider, () => IsDirty = false);
-        }
-
-        void OnChunkLoaded(Chunk chunk)
+        void OnChunkLoaded(ChunkPosition posOfChunk)
         {
             if (!Initialized) return;
 
             // If the chunk is a neighbour of the loaded chunk, update the visible blocks
-            if (chunk.Position.x + 1 == Position.x || chunk.Position.x - 1 == Position.x || chunk.Position.z + 1 == Position.z || chunk.Position.z - 1 == Position.z)
+            if (posOfChunk.x + 1 == Position.x || posOfChunk.x - 1 == Position.x || posOfChunk.z + 1 == Position.z || posOfChunk.z - 1 == Position.z)
             {
                 if (IsDirty)
                 {
                     //ChunkRenderer.RefreshBorderVoxels(this);
-                    ChunkRenderer.RefreshVisibleVoxels(this);
-                    ChunkRenderer.ApplyData(Filter, Collider, () => IsDirty = false);
+                    ChunkRenderer.RefreshVisibleVoxels(this, true);
                 }
             }
         }
@@ -315,7 +212,7 @@ namespace ATKVoxelEngine
             IsListening = false;
             IsDirty = false;
             DebugHelper.OnDebugging -= OnDebugging;
-            VoxelManager.OnChunkTick -= Tick;
+            GameManager.OnChunkTick -= Tick;
 
             ChunkManager.Chunks.TryRemove(Position, out _);
 
@@ -347,39 +244,28 @@ namespace ATKVoxelEngine
 
         void InitDebugLines()
         {
-            borderLines = new LineRenderer[4];
-            for (int i = 0; i < 4; i++)
-            {
-                LineRenderer l = GameObject.Instantiate(VoxelManager.DebugSettings.debugLinePrefab, gameObject.transform).GetComponent<LineRenderer>();
-                l.transform.SetAsFirstSibling();
-                borderLines[i] = l;
-            }
-
-            Vector3Int pos = WorldHelper.ChunkPosToWorldPos(Position);
-
             float offset = 0.5f;
 
             // place the lines at the corners of the chunk
-            float x = pos.x - offset;
-            float z = pos.z - offset;
+            float x = WorldPosition.x - offset;
+            float z = WorldPosition.z - offset;
             borderLines[0].positionCount = 2;
-            borderLines[0].SetPositions(new Vector3[] { new Vector3(x, -VoxelManager.WorldSettings.ChunkSize.y, z), new Vector3(x, +VoxelManager.WorldSettings.ChunkSize.y, z) });
+            borderLines[0].SetPositions(new Vector3[] { new Vector3(x, -EngineSettings.WorldSettings.ChunkSize.y, z), new Vector3(x, +EngineSettings.WorldSettings.ChunkSize.y, z) });
 
-            x = pos.x - offset + VoxelManager.WorldSettings.ChunkSize.x;
-            z = pos.z - offset;
+            x = WorldPosition.x - offset + EngineSettings.WorldSettings.ChunkSize.x;
+            z = WorldPosition.z - offset;
             borderLines[1].positionCount = 2;
-            borderLines[1].SetPositions(new Vector3[] { new Vector3(x, -VoxelManager.WorldSettings.ChunkSize.y, z), new Vector3(x, +VoxelManager.WorldSettings.ChunkSize.y, z) });
+            borderLines[1].SetPositions(new Vector3[] { new Vector3(x, -EngineSettings.WorldSettings.ChunkSize.y, z), new Vector3(x, +EngineSettings.WorldSettings.ChunkSize.y, z) });
 
-
-            x = pos.x - offset;
-            z = pos.z - offset + VoxelManager.WorldSettings.ChunkSize.z;
+            x = WorldPosition.x - offset;
+            z = WorldPosition.z - offset + EngineSettings.WorldSettings.ChunkSize.z;
             borderLines[2].positionCount = 2;
-            borderLines[2].SetPositions(new Vector3[] { new Vector3(x, -VoxelManager.WorldSettings.ChunkSize.y, z), new Vector3(x, +VoxelManager.WorldSettings.ChunkSize.y, z) });
+            borderLines[2].SetPositions(new Vector3[] { new Vector3(x, -EngineSettings.WorldSettings.ChunkSize.y, z), new Vector3(x, +EngineSettings.WorldSettings.ChunkSize.y, z) });
 
-            x = pos.x - offset + VoxelManager.WorldSettings.ChunkSize.x;
-            z = pos.z - offset + VoxelManager.WorldSettings.ChunkSize.z;
+            x = WorldPosition.x - offset + EngineSettings.WorldSettings.ChunkSize.x;
+            z = WorldPosition.z - offset + EngineSettings.WorldSettings.ChunkSize.z;
             borderLines[3].positionCount = 2;
-            borderLines[3].SetPositions(new Vector3[] { new Vector3(x, -VoxelManager.WorldSettings.ChunkSize.y, z), new Vector3(x, +VoxelManager.WorldSettings.ChunkSize.y, z) });
+            borderLines[3].SetPositions(new Vector3[] { new Vector3(x, -EngineSettings.WorldSettings.ChunkSize.y, z), new Vector3(x, +EngineSettings.WorldSettings.ChunkSize.y, z) });
         }
 
         #endregion

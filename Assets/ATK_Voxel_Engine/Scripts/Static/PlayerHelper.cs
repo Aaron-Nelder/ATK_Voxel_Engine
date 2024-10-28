@@ -1,4 +1,5 @@
 using UnityEngine;
+using ATKVoxelEngine;
 
 public static class PlayerHelper
 {
@@ -34,8 +35,8 @@ public static class PlayerHelper
             }
 
             ChunkPosition position = new ChunkPosition();
-            position.x = Mathf.FloorToInt(PlayerManager.Instance.MotionHandler.transform.position.x / VoxelManager.WorldSettings.chunkSize);
-            position.z = Mathf.FloorToInt(PlayerManager.Instance.MotionHandler.transform.position.z / VoxelManager.WorldSettings.chunkSize);
+            position.x = Mathf.FloorToInt(PlayerManager.Instance.MotionHandler.transform.position.x / EngineSettings.WorldSettings.ChunkSize.x);
+            position.z = Mathf.FloorToInt(PlayerManager.Instance.MotionHandler.transform.position.z / EngineSettings.WorldSettings.ChunkSize.z);
             return position;
         }
     }

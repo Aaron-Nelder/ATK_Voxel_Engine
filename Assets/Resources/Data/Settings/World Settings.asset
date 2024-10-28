@@ -15,7 +15,7 @@ MonoBehaviour:
   _chunkPrefab: {fileID: 6213556336917049060, guid: 64d6ce9c2c521614a88117d437c3dae6,
     type: 3}
   _chunkSize: {x: 8, y: 128, z: 8}
-  _renderDistance: 4
+  _renderDistance: 8
   _seed: 0
   _chunkTickRate: 1000
   _heightNoise: {fileID: 11400000, guid: 7123f36e818c008439e9c843194f18b4, type: 2}

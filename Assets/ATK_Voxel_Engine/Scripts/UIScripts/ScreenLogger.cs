@@ -3,28 +3,18 @@ using System.Collections.Generic;
 using UnityEngine.UIElements;
 using System;
 
-public class ScreenLogger : MonoBehaviour
+public class ScreenLogger
 {
     const int MAX_LOGS = 15;
     const float LOG_DURATION = 15f;
 
-    public static ScreenLogger Instance;
-
-    [SerializeField] UIDocument _document;
-
     static VisualElement _logContainer;
-
     static Stack<ScreenLog> _logPool = new Stack<ScreenLog>();
     static Queue<ScreenLog> _logQueue = new Queue<ScreenLog>();
 
-    void OnEnable() => DebugHelper.OnDebugging += EnableLogger;
-    void OnDisable() => DebugHelper.OnDebugging -= EnableLogger;
-    void EnableLogger(bool enabled) => _document.enabled = enabled;
-
-    public void Init()
+    public ScreenLogger(UIDocument doc)
     {
-        Instance = this;
-        AddLabels();
+        AddLabels(doc);
     }
 
     public static void AddToStack(ScreenLog log)
@@ -35,9 +25,9 @@ public class ScreenLogger : MonoBehaviour
             _logContainer.style.opacity = 0;
     }
 
-    void AddLabels()
+    void AddLabels(UIDocument doc)
     {
-        _logContainer = _document.rootVisualElement.Q<VisualElement>("LogContainer");
+        _logContainer = doc.rootVisualElement.Q<VisualElement>("LogContainer");
         Label[] labels = new Label[MAX_LOGS];
         for (int i = 0; i < MAX_LOGS; i++)
         {

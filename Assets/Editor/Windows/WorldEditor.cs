@@ -7,8 +7,8 @@ namespace ATKVoxelEngine
 {
     public class WorldEditor : EditorWindow
     {
-        WorldSettings_SO WorldSettings => VoxelManager.WorldSettings;
-        DebugSettings_SO DebugSettings => VoxelManager.DebugSettings;
+        WorldSettings_SO WorldSettings => EngineSettings.WorldSettings;
+        DebugSettings_SO DebugSettings => EngineSettings.DebugSettings;
         [SerializeField] VisualTreeAsset visualTree = default;
 
         enum Menus { WorldSettings = 0, DebugUI = 1, Preview = 2, MeshCreator = 3 }

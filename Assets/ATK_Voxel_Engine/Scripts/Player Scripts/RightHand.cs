@@ -24,7 +24,7 @@ namespace ATKVoxelEngine
         void Start()
         {
             //TODO:: Change this to a proper voxel / Inventory system
-            _heldVoxel = Instantiate(_heldVoxelPrefab, _heldAnchor).GetComponent<HeldVoxel>().Init(_heldAnchor, VoxelManager.VoxelAtlas[1]);
+            _heldVoxel = Instantiate(_heldVoxelPrefab, _heldAnchor).GetComponent<HeldVoxel>().Init(_heldAnchor, EngineSettings.VoxelAtlas[1]);
 
             _breakSpeed = PlayerManager.Instance.Stats.BreakSpeed;
             _placeSpeed = PlayerManager.Instance.Stats.PlaceSpeed;
@@ -36,7 +36,7 @@ namespace ATKVoxelEngine
             {
                 if (_breakTimer >= _breakSpeed)
                 {
-                    Selector.SelectedVoxel.Chunk?.DestroyVoxel(Selector.SelectedVoxel.LocalPosition);
+                    WorldHelper.DestroyVoxel(WorldHelper.LocalPosToWorldPos(Selector.SelectedVoxel.Chunk.Position, Selector.SelectedVoxel.LocalPosition));
                     _breakTimer = 0;
                 }
                 else
@@ -47,8 +47,7 @@ namespace ATKVoxelEngine
                 if (_placeTimer >= _placeSpeed)
                 {
                     _animator.SetBool(_breakingHash, true);
-                    Vector3Int localPos = WorldHelper.WorldToLocalPos(Selector.SelectedVoxel.NormalWorldPos);
-                    WorldHelper.WorldPosToChunk(Selector.SelectedVoxel.NormalWorldPos)?.PlaceVoxel(localPos, _heldVoxel.Id);
+                    WorldHelper.PlaceVoxel(Selector.SelectedVoxel.NormalWorldPos, _heldVoxel.Id);
                     _placeTimer = 0;
                 }
                 else

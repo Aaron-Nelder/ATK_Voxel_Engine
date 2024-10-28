@@ -237,7 +237,7 @@ namespace ATKVoxelEngine
 
             planes = new Plane[]
             {
-            new Plane(Face.Top,new List<int> { 0, 1, 2, 3 })
+            new Plane(Face.TOP,new List<int> { 0, 1, 2, 3 })
             };
         }
 
@@ -263,12 +263,12 @@ namespace ATKVoxelEngine
 
             planes = new Plane[]
             {
-            new Plane(Face.Top,new List<int>{0,1,2,3 }),
-            new Plane(Face.Bottom,new List<int> { 7, 6, 5, 4 }),
-            new Plane(Face.Left,new List<int> { 5, 1, 0, 4 }),
-            new Plane(Face.Right,new List<int>{7,3,2,6 }),
-            new Plane(Face.Front,new List<int>{6,2,1,5 }),
-            new Plane(Face.Back,new List<int> { 4, 0, 3, 7 })
+            new Plane(Face.TOP,new List<int>{0,1,2,3 }),
+            new Plane(Face.BOTTOM,new List<int> { 7, 6, 5, 4 }),
+            new Plane(Face.LEFT,new List<int> { 5, 1, 0, 4 }),
+            new Plane(Face.RIGHT,new List<int>{7,3,2,6 }),
+            new Plane(Face.FRONT,new List<int>{6,2,1,5 }),
+            new Plane(Face.BACK,new List<int> { 4, 0, 3, 7 })
             };
         }
         #endregion
@@ -294,7 +294,7 @@ namespace ATKVoxelEngine
     public struct Plane
     {
         [SerializeField] Face normal;
-        public Vector3Int Normal => WorldHelper.DirectionEnumToVector(normal);
+        public Vector3Int Normal => WorldHelper.FaceToVec(normal);
 
         [SerializeField] List<int> vertexIndexs;
         public List<int> VertexIndexs => vertexIndexs;

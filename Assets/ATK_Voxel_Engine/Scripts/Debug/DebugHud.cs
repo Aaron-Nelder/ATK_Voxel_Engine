@@ -48,28 +48,28 @@ namespace ATKVoxelEngine
 
             if (_tick < UpdateTime) return;
 
-            if (VoxelManager.DebugSettings.gameShowFPS)
+            if (EngineSettings.DebugSettings.gameShowFPS)
                 _fps.text = DebugHelper.FPS;
 
-            if (VoxelManager.DebugSettings.gameShowPlayerChunk)
+            if (EngineSettings.DebugSettings.gameShowPlayerChunk)
                 _playerChunk.text = $"Chunk: {PlayerHelper.PlayerChunk.x}, {PlayerHelper.PlayerChunk.z}";
 
-            if (VoxelManager.DebugSettings.gameShowPlayerPos)
+            if (EngineSettings.DebugSettings.gameShowPlayerPos)
                 _playerPosition.text = $"Position: {PlayerHelper.PlayerVoxelPosition.x},{PlayerHelper.PlayerVoxelPosition.y}, {PlayerHelper.PlayerVoxelPosition.z}";
 
-            if (VoxelManager.DebugSettings.gameShowActiveChunks)
+            if (EngineSettings.DebugSettings.gameShowActiveChunks)
                 _activeChunks.text = $"Active Chunks: {ChunkManager.Chunks.Count}";
 
-            if (VoxelManager.DebugSettings.gameShowActiveVoxels)
-                _activeVoxels.text = $"Active Voxels: {ChunkManager.Chunks.Count * VoxelManager.WorldSettings.ChunkSize}";
+            if (EngineSettings.DebugSettings.gameShowActiveVoxels)
+                _activeVoxels.text = $"Active Voxels: {ChunkManager.Chunks.Count * EngineSettings.WorldSettings.ChunkSize}";
 
-            if (VoxelManager.DebugSettings.gameShowCPUTime)
+            if (EngineSettings.DebugSettings.gameShowCPUTime)
                 _CPUTime.text = $"CPU Time: {DebugHelper.CPUTime} ms";
 
-            if (VoxelManager.DebugSettings.gameShowGPUTime)
+            if (EngineSettings.DebugSettings.gameShowGPUTime)
                 _GPUTime.text = $"GPU Time: {DebugHelper.GPUTime} ms";
 
-            if (VoxelManager.DebugSettings.gameShowBatches)
+            if (EngineSettings.DebugSettings.gameShowBatches)
                 _Batches.text = $"Batches: {DebugHelper.Batches}";
 
             _tick = 0;

@@ -22,7 +22,7 @@ namespace ATKVoxelEngine
         public List<Vector2> ScaledUVs(List<Vector2> uvs)
         {
             // scale the UVs to the correct texture       
-            CombinedMaterial_SO mat = VoxelManager.MaterialAtlas[materialIndex];
+            CombinedMaterial_SO mat = EngineSettings.MaterialAtlas[materialIndex];
             List<Vector2> scaledUVS = new List<Vector2>();
             for (int i = 0; i < uvs.Count; i++)
             {

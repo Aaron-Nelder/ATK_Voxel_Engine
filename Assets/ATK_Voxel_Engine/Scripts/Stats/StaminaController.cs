@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ATKVoxelEngine;
 
 public class StaminaController : IUpdate
 {

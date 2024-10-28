@@ -18,6 +18,6 @@ MonoBehaviour:
   _octaves: 4
   _lacunarity: 2
   _persistance: 0.5
-  _magClamp: 5
+  _magClamp: 13
   _useThreshold: 1
-  _threshold: {x: 1, y: 2.5}
+  _threshold: {x: 1, y: 5}

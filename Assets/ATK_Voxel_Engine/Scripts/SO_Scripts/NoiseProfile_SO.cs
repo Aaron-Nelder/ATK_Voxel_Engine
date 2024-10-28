@@ -30,6 +30,6 @@ namespace ATKVoxelEngine
         public bool UseThreshold => _useThreshold;
 
         [SerializeField] Vector2 _threshold = new Vector2(0.45f,1);
-        public Vector2 Threashold => _threshold;
+        public Vector2 Threshold => _threshold;
     }
 }

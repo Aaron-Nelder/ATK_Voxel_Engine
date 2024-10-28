@@ -1,55 +1,59 @@
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-public class VoxelHighlight : MonoBehaviour
+namespace ATKVoxelEngine
 {
-    [SerializeField] Material _highlightMaterial;
-    MeshFilter _filter;
-    MeshRenderer _renderer;
-    SelectedVoxel _selectedVoxel;
 
-    Mesh _mesh;
-
-    public VoxelHighlight Init()
+    [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(MeshRenderer))]
+    public class VoxelHighlight : MonoBehaviour
     {
-        _mesh = new Mesh();
-        _filter = GetComponent<MeshFilter>();
-        _renderer = GetComponent<MeshRenderer>();
-        _renderer.sharedMaterial = _highlightMaterial;
-        _filter.sharedMesh = _mesh;
-        _renderer.enabled = false;
-        return this;
-    }
+        [SerializeField] Material _highlightMaterial;
+        MeshFilter _filter;
+        MeshRenderer _renderer;
+        SelectedVoxel _selectedVoxel;
 
-    void OnEnable()
-    {
-        Selector.OnSelect += OnVoxelSelected;
-        Selector.OnDeselect += DisableRenderer;
-    }
+        Mesh _mesh;
 
-    void OnDisable()
-    {
-        Selector.OnSelect -= OnVoxelSelected;
-        Selector.OnDeselect -= DisableRenderer;
-    }
-
-    void OnVoxelSelected(SelectedVoxel newVoxel)
-    {
-        _renderer.enabled = true;
-        if (newVoxel.Id != _selectedVoxel.Id)
+        public VoxelHighlight Init()
         {
-            _mesh.Clear();
-            _mesh = VoxelManager.GetVoxelData(newVoxel.Id).MeshData.Mesh;
+            _mesh = new Mesh();
+            _filter = GetComponent<MeshFilter>();
+            _renderer = GetComponent<MeshRenderer>();
+            _renderer.sharedMaterial = _highlightMaterial;
             _filter.sharedMesh = _mesh;
+            _renderer.enabled = false;
+            return this;
         }
 
-        _selectedVoxel = newVoxel;
-        transform.position = WorldHelper.LocalPosToWorldPos(_selectedVoxel.Chunk.Position, _selectedVoxel.LocalPosition);
-    }
+        void OnEnable()
+        {
+            Selector.OnSelect += OnVoxelSelected;
+            Selector.OnDeselect += DisableRenderer;
+        }
 
-    void DisableRenderer(SelectedVoxel newVoxel)
-    {
-        _renderer.enabled = false;
+        void OnDisable()
+        {
+            Selector.OnSelect -= OnVoxelSelected;
+            Selector.OnDeselect -= DisableRenderer;
+        }
+
+        void OnVoxelSelected(SelectedVoxel newVoxel)
+        {
+            _renderer.enabled = true;
+            if (newVoxel.Id != _selectedVoxel.Id)
+            {
+                _mesh.Clear();
+                _mesh = EngineSettings.GetVoxelData(newVoxel.Id).MeshData.Mesh;
+                _filter.sharedMesh = _mesh;
+            }
+
+            _selectedVoxel = newVoxel;
+            transform.position = WorldHelper.LocalPosToWorldPos(_selectedVoxel.Chunk.Position, _selectedVoxel.LocalPosition);
+        }
+
+        void DisableRenderer(SelectedVoxel newVoxel)
+        {
+            _renderer.enabled = false;
+        }
     }
 }

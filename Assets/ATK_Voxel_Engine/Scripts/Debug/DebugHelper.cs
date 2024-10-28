@@ -49,7 +49,7 @@ namespace ATKVoxelEngine
                     return lastKnowCameraChunk;
 
                 Vector3 cameraPos = Camera.current.transform.position;
-                lastKnowCameraChunk = new ChunkPosition(Mathf.FloorToInt(cameraPos.x / VoxelManager.WorldSettings.ChunkSize.x), Mathf.FloorToInt(cameraPos.z / VoxelManager.WorldSettings.ChunkSize.z));
+                lastKnowCameraChunk = new ChunkPosition(Mathf.FloorToInt(cameraPos.x / EngineSettings.WorldSettings.ChunkSize.x), Mathf.FloorToInt(cameraPos.z / EngineSettings.WorldSettings.ChunkSize.z));
                 return lastKnowCameraChunk;
             }
         }

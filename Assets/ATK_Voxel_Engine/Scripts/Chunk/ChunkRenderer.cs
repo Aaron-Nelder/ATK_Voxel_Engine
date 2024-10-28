@@ -6,11 +6,6 @@ namespace ATKVoxelEngine
 {
     public struct ChunkRenderer
     {
-        //NativeHashMap<Vector3Int, NativeList<Vector3>> vertices;
-        //NativeHashMap<Vector3Int, NativeList<int>> indices;
-        //NativeHashMap<Vector3Int, NativeList<Vector2>> uvs;
-        //NativeHashMap<Vector3Int, NativeList<Vector3>> normals;
-
         Dictionary<Vector3Int, List<Vector3>> _vertices;
         Dictionary<Vector3Int, List<int>> _indices;
         Dictionary<Vector3Int, List<Vector2>> _uvs;
@@ -40,10 +35,13 @@ namespace ATKVoxelEngine
         }
 
         // Re-Generates the mesh for the chunk with only the blocks that were visible before
-        public void RefreshVisibleVoxels(Chunk chunk)
+        public void RefreshVisibleVoxels(Chunk chunk,bool applyData = false)
         {
             foreach (var v in chunk.Voxels)
                 AddVisibleFaces(chunk, v.Key);
+
+            if (applyData)
+                ApplyData(chunk);
         }
 
         //Write me a function that only refreshes the border voxels
@@ -51,7 +49,7 @@ namespace ATKVoxelEngine
         {
             foreach (var v in chunk.Voxels)
             {
-                if (v.Key.x == 0 || v.Key.x == VoxelManager.WorldSettings.ChunkSize.x - 1 || v.Key.z == 0 || v.Key.z == VoxelManager.WorldSettings.ChunkSize.z - 1)
+                if (v.Key.x == 0 || v.Key.x == EngineSettings.WorldSettings.ChunkSize.x - 1 || v.Key.z == 0 || v.Key.z == EngineSettings.WorldSettings.ChunkSize.z - 1)
                 {
                     AddVisibleFaces(chunk, v.Key);
                 }
@@ -59,7 +57,7 @@ namespace ATKVoxelEngine
         }
 
         // Applies the combined vertices, indices, uvs and normals to one signal mesh and applies it to the mesh filter and collider
-        public void ApplyData(MeshFilter filter, MeshCollider collider, Action callback = null)
+        public void ApplyData(Chunk chunk, Action callback = null)
         {
             List<Vector3> vertValues = new List<Vector3>();
             foreach (var b in _vertices)
@@ -82,21 +80,22 @@ namespace ATKVoxelEngine
             foreach (var b in _normals)
                 normValues.AddRange(b.Value);
 
-            filter.sharedMesh.Clear();
-            filter.sharedMesh.SetVertices(vertValues);
-            filter.sharedMesh.SetIndices(indicesValues, MeshTopology.Quads, 0);
-            filter.sharedMesh.SetUVs(0, uvValues);
-            filter.sharedMesh.SetNormals(normValues);
-            filter.sharedMesh.RecalculateBounds();
+            chunk.Filter.sharedMesh.Clear();
+            chunk.Filter.sharedMesh.SetVertices(vertValues);
+            chunk.Filter.sharedMesh.SetIndices(indicesValues, MeshTopology.Quads, 0);
+            chunk.Filter.sharedMesh.SetUVs(0, uvValues);
+            chunk.Filter.sharedMesh.SetNormals(normValues);
+            chunk.Filter.sharedMesh.RecalculateBounds();
 
-            collider.sharedMesh = filter.sharedMesh;
+            chunk.Collider.sharedMesh = chunk.Filter.sharedMesh;
+            chunk.IsDirty = false;
             callback?.Invoke();
         }
 
         public void AddVisibleFaces(Chunk chunk, Vector3Int position)
         {
             if (chunk.Voxels[position] == 0) return;
-            VoxelData_SO data = VoxelManager.GetVoxelData(chunk.Voxels[position]);
+            VoxelData_SO data = EngineSettings.GetVoxelData(chunk.Voxels[position]);
 
             if (!data.MeshData.GetVisiblesPlanes(chunk.Position, position, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<Vector3> normals))
                 return;
@@ -108,7 +107,7 @@ namespace ATKVoxelEngine
         {
             uint id = chunk.Voxels[position];
             if (id == 0) return;
-            VoxelData_SO data = VoxelManager.GetVoxelData(id);
+            VoxelData_SO data = EngineSettings.GetVoxelData(id);
             data.MeshData.GetPlane(position, faceNormal, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<Vector3> normals);
 
             AddData(chunk, position, vertices, indices, data.ScaledUVs(uvs), normals);
@@ -121,7 +120,7 @@ namespace ATKVoxelEngine
             _indices[pos].Clear();
             _uvs[pos].Clear();
             _normals[pos].Clear();
-            chunk.MarkDirty();
+            chunk.IsDirty = true;
         }
 
         void SetData(Chunk chunk, Vector3Int pos, List<Vector3> vertices, List<int> indices, List<Vector2> uvs, List<Vector3> normals)
@@ -135,7 +134,7 @@ namespace ATKVoxelEngine
             _indices[pos] = indicesCopy;
             _uvs[pos] = uvs;
             _normals[pos] = normals;
-            chunk.MarkDirty();
+            chunk.IsDirty = true;
         }
 
         void AddData(Chunk chunk, Vector3Int pos, List<Vector3> vertices, List<int> indices, List<Vector2> uvs, List<Vector3> normals)
@@ -149,7 +148,7 @@ namespace ATKVoxelEngine
             _indices[pos].AddRange(indicesCopy);
             _uvs[pos].AddRange(uvs);
             _normals[pos].AddRange(normals);
-            chunk.MarkDirty();
+            chunk.IsDirty = true;
         }
     }
 }

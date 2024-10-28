@@ -12,21 +12,9 @@ namespace ATKVoxelEngine
         public static ConcurrentDictionary<ChunkPosition, Chunk> Chunks { get; private set; } = new ConcurrentDictionary<ChunkPosition, Chunk>();
         #endregion
 
-        public static event Action<Chunk> OnChunkLoaded;
+        public static Action<ChunkPosition> OnChunkLoaded;
         public static event Action<ChunkPosition, ChunkPosition> OnPlayerChunkUpdate;
         public static void IvokeOnPlayerChunkUpdate(ChunkPosition playerChunk, ChunkPosition dir) => OnPlayerChunkUpdate?.Invoke(playerChunk, dir);
-
-        static bool allChunksListening;
-        public static bool AllChunksListening
-        {
-            get => allChunksListening;
-            set
-            {
-                allChunksListening = value;
-                foreach (var chunk in Chunks)
-                    chunk.Value.IsListening = value;
-            }
-        }
 
         public static void SpawnStartingChunks(Transform parent, bool isEditor = false)
         {
@@ -35,43 +23,36 @@ namespace ATKVoxelEngine
 
             GenerateChunksAtOrigin();
 
-            AllChunksListening = true;
-            InvokeOnLoadForAllChunks();
-
             OnPlayerChunkUpdate += OnPlayerChunkChange;
-        }
-
-        static void InvokeOnLoadForAllChunks()
-        {
-            foreach (var chunk in Chunks)
-                OnChunkLoaded?.Invoke(chunk.Value);
         }
 
         static void GenerateChunksAtOrigin()
         {
-            int interval = VoxelManager.WorldSettings.RenderDistance / 2;
+            int interval = EngineSettings.WorldSettings.RenderDistance / 2;
             for (int x = -interval; x < interval + 1; x += 1)
                 for (int z = -interval; z < interval + 1; z += 1)
-                    GenerateChunk(new(x, z), false,false);
+                    GenerateChunk(new(x, z), true, false);
         }
 
         static void GenerateChunk(ChunkPosition pos, bool listening = true, bool isEditor = false)
         {
             if (Chunks.ContainsKey(pos)) return;
-            GameObject chunkObj = GameObject.Instantiate(VoxelManager.WorldSettings.ChunkPrefab, WorldHelper.ChunkPosToWorldPos(pos), Quaternion.identity, chunkParent);
+            GameObject chunkObj = GameManager.Instance.Pool.ChunkOBJPool.Get();
+            chunkObj.transform.position = WorldHelper.ChunkPosToWorldPos(pos);
+            chunkObj.transform.SetParent(chunkParent);
             chunkObj.name = $"Chunk: ({pos.x},{pos.z})";
             chunkObj.GetComponent<Chunk>().Startup(pos, listening, isEditor);
         }
 
         public static void OnPlayerChunkChange(ChunkPosition playerChunk, ChunkPosition dir)
         {
-            LoadChunks(playerChunk, dir);
-            UnloadChunks(playerChunk, dir);
+            LoadRenderDistance(playerChunk, dir);
+            UnloadRenderDistance(playerChunk, dir);
         }
 
-        static void LoadChunks(ChunkPosition playerChunk, ChunkPosition dir)
+        static void LoadRenderDistance(ChunkPosition playerChunk, ChunkPosition dir)
         {
-            int halfRenderDistance = VoxelManager.WorldSettings.RenderDistance / 2;
+            int halfRenderDistance = EngineSettings.WorldSettings.RenderDistance / 2;
 
             ChunkPosition newDir = dir * halfRenderDistance;
 
@@ -80,22 +61,22 @@ namespace ATKVoxelEngine
                 if (newDir.x == 0)
                 {
                     int z = newDir.z > 0 ? newDir.z - 1 : newDir.z + 1;
-                    Chunks[new(playerChunk.x + row, playerChunk.z + z)].MarkDirty();
+                    Chunks[new(playerChunk.x + row, playerChunk.z + z)].IsDirty = true;
                     GenerateChunk(new(playerChunk.x + row, playerChunk.z + newDir.z));
                 }
                 else
                 {
                     int x = newDir.x > 0 ? newDir.x - 1 : newDir.x + 1;
-                    Chunks[new(playerChunk.x + x, playerChunk.z + row)].MarkDirty();
+                    Chunks[new(playerChunk.x + x, playerChunk.z + row)].IsDirty = true;
                     GenerateChunk(new(playerChunk.x + newDir.x, playerChunk.z + row));
                 }
             }
         }
 
         // Unload chunks that are not in the render distance
-        static void UnloadChunks(ChunkPosition playerChunk, ChunkPosition dir)
+        static void UnloadRenderDistance(ChunkPosition playerChunk, ChunkPosition dir)
         {
-            int halfRenderDistance = VoxelManager.WorldSettings.RenderDistance / 2;
+            int halfRenderDistance = EngineSettings.WorldSettings.RenderDistance / 2;
 
             dir = -dir * halfRenderDistance;
 
@@ -122,16 +103,14 @@ namespace ATKVoxelEngine
                 if (dir.x == 0)
                 {
                     ChunkPosition pos = new(playerChunk.x + row, playerChunk.z + startDir.z);
-                    Chunks[pos].MarkDirty();
+                    Chunks[pos].IsDirty = true;
                 }
                 else
                 {
                     ChunkPosition pos = new(playerChunk.x + startDir.x, playerChunk.z + row);
-                    Chunks[pos].MarkDirty();
+                    Chunks[pos].IsDirty = true;
                 }
             }
-
-
         }
 
         // Disposes of all chunks

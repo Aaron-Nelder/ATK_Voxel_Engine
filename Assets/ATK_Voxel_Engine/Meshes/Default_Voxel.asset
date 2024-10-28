@@ -24,7 +24,7 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: -0.5}
   meshTopology: 2
   planes:
-  - normal: 0
+  - normal: 1
     vertexIndexs: 00000000010000000200000003000000
     indices: 00000000010000000200000003000000
     uvs:
@@ -32,8 +32,7 @@ MonoBehaviour:
     - {x: 0.5, y: 1}
     - {x: 1, y: 1}
     - {x: 1, y: 0.5}
-    texture: {fileID: 1633477786, guid: 022307f47908a9c47ad8fcb657303c77, type: 3}
-  - normal: 1
+  - normal: 2
     vertexIndexs: 07000000060000000500000004000000
     indices: 00000000010000000200000003000000
     uvs:
@@ -41,8 +40,7 @@ MonoBehaviour:
     - {x: 0, y: 0.5}
     - {x: 0.5, y: 0.5}
     - {x: 0, y: 0.5}
-    texture: {fileID: -673259027, guid: 022307f47908a9c47ad8fcb657303c77, type: 3}
-  - normal: 2
+  - normal: 3
     vertexIndexs: 05000000010000000000000004000000
     indices: 00000000010000000200000003000000
     uvs:
@@ -50,8 +48,7 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 0.5, y: 1}
     - {x: 0.5, y: 0.5}
-    texture: {fileID: -1455769651, guid: 022307f47908a9c47ad8fcb657303c77, type: 3}
-  - normal: 3
+  - normal: 4
     vertexIndexs: 07000000030000000200000006000000
     indices: 00000000010000000200000003000000
     uvs:
@@ -59,8 +56,7 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 0.5, y: 1}
     - {x: 0.5, y: 0.5}
-    texture: {fileID: -1455769651, guid: 022307f47908a9c47ad8fcb657303c77, type: 3}
-  - normal: 4
+  - normal: 5
     vertexIndexs: 06000000020000000100000005000000
     indices: 00000000010000000200000003000000
     uvs:
@@ -68,8 +64,7 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 0.5, y: 1}
     - {x: 0.5, y: 0.5}
-    texture: {fileID: -1455769651, guid: 022307f47908a9c47ad8fcb657303c77, type: 3}
-  - normal: 5
+  - normal: 6
     vertexIndexs: 04000000000000000300000007000000
     indices: 00000000010000000200000003000000
     uvs:
@@ -77,5 +72,4 @@ MonoBehaviour:
     - {x: 0, y: 1}
     - {x: 0.5, y: 1}
     - {x: 0.5, y: 0.5}
-    texture: {fileID: -1455769651, guid: 022307f47908a9c47ad8fcb657303c77, type: 3}
   mesh: {fileID: 4300000, guid: a26a8a92c9846444584b03d6b9ddcb9d, type: 2}

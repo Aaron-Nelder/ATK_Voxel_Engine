@@ -1,9 +1,6 @@
 fileFormatVersion: 2
-guid: a542881e8c69ff842addc98155fc4bcb
-labels:
-- Editor
-folderAsset: yes
-DefaultImporter:
+guid: 770c2b4c966b77841bc2ce79ae0bef8e
+AssemblyDefinitionImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
