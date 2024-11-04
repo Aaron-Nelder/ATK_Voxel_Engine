@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace ATKVoxelEngine
@@ -8,18 +9,15 @@ namespace ATKVoxelEngine
     {
         static Transform chunkParent;
 
-        #region Dictionary
         public static ConcurrentDictionary<ChunkPosition, Chunk> Chunks { get; private set; } = new ConcurrentDictionary<ChunkPosition, Chunk>();
-        #endregion
 
         public static Action<ChunkPosition> OnChunkLoaded;
-        public static event Action<ChunkPosition, ChunkPosition> OnPlayerChunkUpdate;
-        public static void IvokeOnPlayerChunkUpdate(ChunkPosition playerChunk, ChunkPosition dir) => OnPlayerChunkUpdate?.Invoke(playerChunk, dir);
+        public static Action<ChunkPosition, ChunkPosition> OnPlayerChunkUpdate;
 
-        public static void SpawnStartingChunks(Transform parent, bool isEditor = false)
+        public static void SpawnStartingChunks(Transform parent)
         {
             chunkParent = parent;
-            Dispose(isEditor);
+            Dispose();
 
             GenerateChunksAtOrigin();
 
@@ -31,17 +29,18 @@ namespace ATKVoxelEngine
             int interval = EngineSettings.WorldSettings.RenderDistance / 2;
             for (int x = -interval; x < interval + 1; x += 1)
                 for (int z = -interval; z < interval + 1; z += 1)
-                    GenerateChunk(new(x, z), true, false);
+                    GenerateChunk(new(x, z), true);
         }
 
-        static void GenerateChunk(ChunkPosition pos, bool listening = true, bool isEditor = false)
+        static void GenerateChunk(ChunkPosition pos, bool useThreads = true)
         {
             if (Chunks.ContainsKey(pos)) return;
             GameObject chunkObj = GameManager.Instance.Pool.ChunkOBJPool.Get();
-            chunkObj.transform.position = WorldHelper.ChunkPosToWorldPos(pos);
+            int3 chunkPos = WorldHelper.ChunkPosToWorldPos(pos);
+            chunkObj.transform.position = new Vector3(chunkPos.x, chunkPos.y, chunkPos.z);
             chunkObj.transform.SetParent(chunkParent);
             chunkObj.name = $"Chunk: ({pos.x},{pos.z})";
-            chunkObj.GetComponent<Chunk>().Startup(pos, listening, isEditor);
+            chunkObj.GetComponent<Chunk>().Startup(pos, useThreads);
         }
 
         public static void OnPlayerChunkChange(ChunkPosition playerChunk, ChunkPosition dir)
@@ -61,13 +60,11 @@ namespace ATKVoxelEngine
                 if (newDir.x == 0)
                 {
                     int z = newDir.z > 0 ? newDir.z - 1 : newDir.z + 1;
-                    Chunks[new(playerChunk.x + row, playerChunk.z + z)].IsDirty = true;
                     GenerateChunk(new(playerChunk.x + row, playerChunk.z + newDir.z));
                 }
                 else
                 {
                     int x = newDir.x > 0 ? newDir.x - 1 : newDir.x + 1;
-                    Chunks[new(playerChunk.x + x, playerChunk.z + row)].IsDirty = true;
                     GenerateChunk(new(playerChunk.x + newDir.x, playerChunk.z + row));
                 }
             }
@@ -89,28 +86,10 @@ namespace ATKVoxelEngine
 
             // Disposes of the chunk row
             for (int row = -halfRenderDistance; row < halfRenderDistance + 1; row++)
-            {
                 if (dir.x == 0)
                     Chunks[new(playerChunk.x + row, playerChunk.z + dir.z)].Dispose();
                 else
                     Chunks[new(playerChunk.x + dir.x, playerChunk.z + row)].Dispose();
-            }
-
-
-            // Updates the row in the direction of the player from the row that was disposed
-            for (int row = -halfRenderDistance; row < halfRenderDistance + 1; row++)
-            {
-                if (dir.x == 0)
-                {
-                    ChunkPosition pos = new(playerChunk.x + row, playerChunk.z + startDir.z);
-                    Chunks[pos].IsDirty = true;
-                }
-                else
-                {
-                    ChunkPosition pos = new(playerChunk.x + startDir.x, playerChunk.z + row);
-                    Chunks[pos].IsDirty = true;
-                }
-            }
         }
 
         // Disposes of all chunks
@@ -122,10 +101,7 @@ namespace ATKVoxelEngine
         }
 
         #region Editor
-        public static void PreviewChunkEditor(ChunkPosition pos)
-        {
-            GenerateChunk(pos, false, true);
-        }
+        public static void PreviewChunkEditor(ChunkPosition pos) => GenerateChunk(pos, false);
         #endregion
     }
 

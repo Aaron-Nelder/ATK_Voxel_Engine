@@ -5,20 +5,24 @@ public static class PlayerHelper
 {
     const string REF_WARINGING = "Player or PlayerCC is null Returning (0,0)";
     
-    public static void SnapPlayerToSurface(float startY = 500)
+    public static void SnapPlayerToVoxel(Chunk chunk,int voxelX, int voxelZ)
     {
         if (PlayerManager.Instance is null) return;
 
-        Vector3 playerPosition = PlayerManager.Instance.transform.position;
-        playerPosition.y = startY;
+        Vector3 playerPos = chunk.transform.position + new Vector3(voxelX, EngineSettings.WorldSettings.ChunkSize.y, voxelZ);
+        PlayerManager.Instance.transform.position = playerPos;
         
         float playerHeight = PlayerManager.Instance.MotionHandler.Controller.height * 0.5f;
         PlayerManager.Instance.MotionHandler.Controller.enabled = false;
 
-        if (Physics.Raycast(playerPosition, Vector3.down, out RaycastHit hit, Mathf.Infinity))
+        for(int y = EngineSettings.WorldSettings.ChunkSize.y -1; y >0; y--)
         {
-            playerPosition = new Vector3(playerPosition.x, hit.point.y + playerHeight, playerPosition.z);
-            PlayerManager.Instance.transform.position = playerPosition;
+            if(chunk.GetVoxel(voxelX,y, voxelZ) != 0)
+            {
+                playerPos = new Vector3(playerPos.x, y + playerHeight + 0.5f, playerPos.z);
+                PlayerManager.Instance.transform.position = playerPos;
+                break;
+            }
         }
 
         PlayerManager.Instance.MotionHandler.Controller.enabled = true;       
@@ -34,10 +38,7 @@ public static class PlayerHelper
                 return new ChunkPosition(0, 0);
             }
 
-            ChunkPosition position = new ChunkPosition();
-            position.x = Mathf.FloorToInt(PlayerManager.Instance.MotionHandler.transform.position.x / EngineSettings.WorldSettings.ChunkSize.x);
-            position.z = Mathf.FloorToInt(PlayerManager.Instance.MotionHandler.transform.position.z / EngineSettings.WorldSettings.ChunkSize.z);
-            return position;
+            return WorldHelper.WorldToChunkPos(PlayerManager.Instance.transform.position);
         }
     }
 

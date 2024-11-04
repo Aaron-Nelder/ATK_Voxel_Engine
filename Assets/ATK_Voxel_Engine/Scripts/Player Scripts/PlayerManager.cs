@@ -22,7 +22,7 @@ public class PlayerManager : MonoBehaviour
         ChunkPosition currentChunk = PlayerHelper.PlayerChunk;
         if (playerChunk != currentChunk)
         {
-            ChunkManager.IvokeOnPlayerChunkUpdate(currentChunk, currentChunk - playerChunk);
+            ChunkManager.OnPlayerChunkUpdate(currentChunk, currentChunk - playerChunk);
             playerChunk = currentChunk;
         }
     }

@@ -65,7 +65,7 @@ namespace ATKVoxelEngine
 
         // Generates a 3D noise map for caves
         public static int[,,] GetNoise3D(WorldSettings_SO wSettings, NoiseProfile_SO pro, int xOffset, int yOffset)
-        {           
+        {
             // create a noise map
             int[,,] noiseMap = new int[wSettings.ChunkSize.x, wSettings.ChunkSize.y, wSettings.ChunkSize.z];
 
@@ -128,8 +128,9 @@ namespace ATKVoxelEngine
                 }
             }
             return noiseMap;
-            
+
         }
+        
         static float Perlin3D(float x, float y, float z)
         {
             float ab = Mathf.PerlinNoise(x, y);

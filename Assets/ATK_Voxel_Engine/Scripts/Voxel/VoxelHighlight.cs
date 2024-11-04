@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace ATKVoxelEngine
@@ -42,13 +43,15 @@ namespace ATKVoxelEngine
             _renderer.enabled = true;
             if (newVoxel.Id != _selectedVoxel.Id)
             {
-                _mesh.Clear();
-                _mesh = EngineSettings.GetVoxelData(newVoxel.Id).MeshData.Mesh;
-                _filter.sharedMesh = _mesh;
+                //_mesh.Clear();
+                //_mesh = EngineSettings.GetVoxelData(newVoxel.Id).OldMeshData.Mesh;
+                //_filter.sharedMesh = _mesh;
             }
 
             _selectedVoxel = newVoxel;
-            transform.position = WorldHelper.LocalPosToWorldPos(_selectedVoxel.Chunk.Position, _selectedVoxel.LocalPosition);
+
+            int3 pos = WorldHelper.LocalPosToWorldPos(_selectedVoxel.Chunk.Position, _selectedVoxel.LocalPosition);
+            transform.position = new Vector3Int(pos.x,pos.y,pos.z);
         }
 
         void DisableRenderer(SelectedVoxel newVoxel)

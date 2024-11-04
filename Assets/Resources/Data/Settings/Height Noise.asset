@@ -20,4 +20,6 @@ MonoBehaviour:
   _persistance: 0.5
   _magClamp: 100
   _useThreshold: 0
-  _threshold: {x: 0.5, y: 1.285963}
+  _threshold:
+    x: 0.5
+    y: 1

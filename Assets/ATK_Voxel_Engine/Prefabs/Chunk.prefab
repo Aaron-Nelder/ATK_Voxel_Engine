@@ -10,9 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8667048117572333218}
   - component: {fileID: 9112537403689837316}
-  - component: {fileID: 7328309304130738692}
-  - component: {fileID: 447892647564059075}
   - component: {fileID: 1117919574769808298}
+  - component: {fileID: 7978215879177392273}
   m_Layer: 0
   m_Name: Chunk
   m_TagString: Chunk
@@ -51,67 +50,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebc2bb8ef7e34024a842d0b67dfc5ee2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Filter>k__BackingField: {fileID: 7328309304130738692}
-  <Renderer>k__BackingField: {fileID: 447892647564059075}
-  <Collider>k__BackingField: {fileID: 1117919574769808298}
+  <RenderManager>k__BackingField: {fileID: 7978215879177392273}
   borderLines:
   - {fileID: 2620273659811086038}
   - {fileID: 7669993180925652147}
   - {fileID: 6164183196294472983}
   - {fileID: 4357265767973053928}
---- !u!33 &7328309304130738692
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6213556336917049060}
-  m_Mesh: {fileID: 0}
---- !u!23 &447892647564059075
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6213556336917049060}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 0
-  m_LightProbeUsage: 0
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 62731bb447afb9646a64dda0902c0b42, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!64 &1117919574769808298
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -134,6 +78,20 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!114 &7978215879177392273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6213556336917049060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b98735212f37643b9ca0b5f3cf4b28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _material: {fileID: 2100000, guid: d549ff54e1f13094198084e484261733, type: 2}
+  _collider: {fileID: 1117919574769808298}
 --- !u!1001 &2635985222886324735
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -142,10 +100,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8667048117572333218}
     m_Modifications:
+    - target: {fileID: 56844316693972777, guid: f343826a6d77fa143a5ea859f97f89ee,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
         type: 3}
       propertyPath: m_Name
       value: Debug Line
+      objectReference: {fileID: 0}
+    - target: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 932842807096291767, guid: f343826a6d77fa143a5ea859f97f89ee,
         type: 3}
@@ -222,10 +190,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8667048117572333218}
     m_Modifications:
+    - target: {fileID: 56844316693972777, guid: f343826a6d77fa143a5ea859f97f89ee,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
         type: 3}
       propertyPath: m_Name
       value: Debug Line (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 932842807096291767, guid: f343826a6d77fa143a5ea859f97f89ee,
         type: 3}
@@ -302,10 +280,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8667048117572333218}
     m_Modifications:
+    - target: {fileID: 56844316693972777, guid: f343826a6d77fa143a5ea859f97f89ee,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
         type: 3}
       propertyPath: m_Name
       value: Debug Line (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 932842807096291767, guid: f343826a6d77fa143a5ea859f97f89ee,
         type: 3}
@@ -382,10 +370,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8667048117572333218}
     m_Modifications:
+    - target: {fileID: 56844316693972777, guid: f343826a6d77fa143a5ea859f97f89ee,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
         type: 3}
       propertyPath: m_Name
       value: Debug Line (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 932842807096291767, guid: f343826a6d77fa143a5ea859f97f89ee,
         type: 3}

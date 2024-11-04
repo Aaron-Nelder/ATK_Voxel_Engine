@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 using ATKVoxelEngine;
 
@@ -22,7 +21,6 @@ public class HeldVoxel: MonoBehaviour
     void AssignMesh(VoxelData_SO data)
     {
         _filter.mesh = data.MeshData.Mesh;
-        _filter.mesh.SetUVs(0, data.ScaledUVs(_filter.mesh.uv.ToList()));
-        _renderer.material = EngineSettings.MaterialAtlas[0].Material;
+        _renderer.material = data.MeshData.material;
     }
 }

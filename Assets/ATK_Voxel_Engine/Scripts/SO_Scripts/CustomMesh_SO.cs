@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Mathematics;
 
 namespace ATKVoxelEngine
 {
@@ -41,7 +42,7 @@ namespace ATKVoxelEngine
                 List<Vector3> norms = new List<Vector3>();
                 foreach (var plane in Planes)
                     for (int i = 0; i < 4; i++)
-                        norms.Add(plane.Normal);
+                        norms.Add(new(plane.Normal.x, plane.Normal.y, plane.Normal.z));
                 return norms;
             }
         }
@@ -82,13 +83,13 @@ namespace ATKVoxelEngine
             return mesh;
         }
 
-        public bool GetVisiblesPlanes(ChunkPosition chunkPos, Vector3Int voxelPosition, out List<Vector3> vertices, out List<int> indices, out List<Vector2> UVs, out List<Vector3> normals)
+        public bool GetVisiblesPlanes(ChunkPosition chunkPos, int3 vPos, out List<Vector3> vertices, out List<int> indices, out List<Vector2> UVs, out List<int3> normals)
         {
             int topologyOffset = meshTopology == MeshTopology.Quads ? 4 : 3;
             vertices = new List<Vector3>();
             indices = new List<int>();
             UVs = new List<Vector2>();
-            normals = new List<Vector3>();
+            normals = new List<int3>();
             int offset = 0;
             bool hasVisible = false;
 
@@ -96,11 +97,11 @@ namespace ATKVoxelEngine
             foreach (var plane in Planes)
             {
                 // if the plane is visible
-                if (!WorldHelper.IsOccupied(chunkPos, voxelPosition + plane.Normal))
+                if (!WorldHelper.IsOccupied(chunkPos, vPos + plane.Normal))
                 {
                     // Vertices
                     foreach (var index in plane.VertexIndexs)
-                        vertices.Add(this.vertices[index] + voxelPosition);
+                        vertices.Add(this.vertices[index] + new Vector3Int(vPos.x, vPos.y, vPos.z));
 
                     // Indices
                     foreach (var index in plane.Indices)
@@ -122,27 +123,66 @@ namespace ATKVoxelEngine
             return hasVisible;
         }
 
-        public bool IsVisible(ChunkPosition chunkPos, Vector3Int voxelPosition)
+        public void GetPlanesFromInt(int visibleSides, int3 vPos, out List<Vector3> vertices, out List<int> indices, out List<Vector2> UVs, out List<int3> normals)
+        {
+            int topologyOffset = meshTopology == MeshTopology.Quads ? 4 : 3;
+            vertices = new List<Vector3>();
+            indices = new List<int>();
+            UVs = new List<Vector2>();
+            normals = new List<int3>();
+            int offset = 0;
+
+            foreach (var plane in Planes)
+            {
+                // if the plane is visible
+                if ((WorldHelper.IsBitSet(visibleSides, 0) && plane.Normal.Equals(new int3(0, 1, 0)))
+                    || (WorldHelper.IsBitSet(visibleSides, 1) && plane.Normal.Equals(new int3(0, -1, 0)))
+                    || (WorldHelper.IsBitSet(visibleSides, 2) && plane.Normal.Equals(new int3(-1, 0, 0)))
+                    || (WorldHelper.IsBitSet(visibleSides, 3) && plane.Normal.Equals(new int3(1, 0, 0)))
+                    || (WorldHelper.IsBitSet(visibleSides, 4) && plane.Normal.Equals(new int3(0, 0, 1)))
+                    || (WorldHelper.IsBitSet(visibleSides, 5) && plane.Normal.Equals(new int3(0, 0, -1))))
+                {
+                    // Vertices
+                    foreach (var index in plane.VertexIndexs)
+                        vertices.Add(this.vertices[index] + new Vector3(vPos.x, vPos.y, vPos.z));
+
+                    // Indices
+                    foreach (var index in plane.Indices)
+                        indices.Add(index + offset);
+                    offset += topologyOffset;
+
+                    // UVs
+                    foreach (var uv in plane.UVS)
+                        UVs.Add(uv);
+
+                    // Normals
+                    for (int i = 0; i < topologyOffset; i++)
+                        normals.Add(plane.Normal);
+                }
+            }
+        }
+
+        public bool IsVisible(ChunkPosition chunkPos, int3 vPos)
         {
             foreach (var plane in Planes)
-                if (!WorldHelper.IsOccupied(chunkPos, voxelPosition + plane.Normal))
+                if (!WorldHelper.IsOccupied(chunkPos, vPos + plane.Normal))
                     return true;
 
             return false;
         }
 
-        public Plane GetPlane(Vector3Int voxelPosition, Vector3Int direction, out List<Vector3> verticies, out List<int> Indicies, out List<Vector2> UVS, out List<Vector3> Normals)
+        public Plane GetPlane(int3 vPos, int3 dir, out List<Vector3> verticies, out List<int> Indicies, out List<Vector2> UVS, out List<int3> Normals)
         {
             verticies = new List<Vector3>() { Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero };
             Indicies = new List<int>();
             UVS = new List<Vector2>();
-            Normals = new List<Vector3>() { Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero };
+            Normals = new List<int3>() { int3.zero, int3.zero, int3.zero, int3.zero };
             foreach (var plane in Planes)
             {
-                if (plane.Normal == direction)
+                if (plane.Normal.Equals(dir))
                 {
                     for (int i = 0; i < 4; i++)
-                        verticies[i] = vertices[plane.VertexIndexs[i]] + voxelPosition;
+                        verticies[i] = vertices[plane.VertexIndexs[i]] + new Vector3(vPos.x, vPos.y, vPos.z);
                     Indicies = plane.Indices;
                     UVS = plane.UVS;
                     for (int i = 0; i < 4; i++)
@@ -294,7 +334,7 @@ namespace ATKVoxelEngine
     public struct Plane
     {
         [SerializeField] Face normal;
-        public Vector3Int Normal => WorldHelper.FaceToVec(normal);
+        public int3 Normal => WorldHelper.FaceToVec(normal);
 
         [SerializeField] List<int> vertexIndexs;
         public List<int> VertexIndexs => vertexIndexs;

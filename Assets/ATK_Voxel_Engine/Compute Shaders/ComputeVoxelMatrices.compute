@@ -1,0 +1,84 @@
+#pragma kernel CSMain
+
+int3 ChunkSize;
+int2 ChunkPosition;
+uint AllVoxelCount;
+
+Buffer<uint> Voxels;
+RWStructuredBuffer<float4x4> VisibleVoxelMatrix;
+RWStructuredBuffer<uint> VoxelVisibility;
+
+// checks if a position is within the bounds of the chunk
+bool InBounds(int3 pos)
+{
+    return pos.x >= 0 && pos.x < ChunkSize.x &&
+           pos.y >= 0 && pos.y < ChunkSize.y &&
+           pos.z >= 0 && pos.z < ChunkSize.z;
+}
+
+// Checks to see if the given face is exposed
+bool IsExposed(uint3 id, int3 direction)
+{
+    int3 newPos = id + direction;
+    if (InBounds(newPos))
+    {
+        uint voxel = Voxels[newPos.x + newPos.y * ChunkSize.x + newPos.z * ChunkSize.x * ChunkSize.y];
+        return voxel == 0;
+    }
+    else
+        return true;
+}
+
+bool IsVisible(uint3 id)
+{
+    if (IsExposed(id, int3(0, 1, 0)))
+        return true;
+    else if (IsExposed(id, int3(0, -1, 0)))
+        return true;
+    else if (IsExposed(id, int3(-1, 0, 0)))
+        return true;
+    else if (IsExposed(id, int3(1, 0, 0)))
+        return true;
+    else if (IsExposed(id, int3(0, 0, 1)))
+        return true;
+    else if (IsExposed(id, int3(0, 0, -1)))
+        return true;
+    else
+        return false;
+}
+
+[numthreads(8, 8, 8)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    uint index = id.x + id.y * ChunkSize.x + id.z * ChunkSize.x * ChunkSize.y;
+    
+    if (index >= AllVoxelCount)
+        return;
+    
+    // returns if the voxel is air
+    if (Voxels[index] == 0)
+    {
+        VoxelVisibility[index] = 0;
+        return;
+    }
+    
+    // returns if there issn't a face exposed
+    if (!IsVisible(id))
+    {
+        VoxelVisibility[index] = 0;
+        return;
+    }
+    
+    // calculates the world position of the voxel
+    float3 chunkPos = float3(ChunkPosition.x * ChunkSize.x, 0, ChunkPosition.y * ChunkSize.z);
+    float3 worldPos = chunkPos + float3(id.x, id.y, id.z);  
+    float4x4 tranformationMatrix = float4x4(
+        1, 0, 0, worldPos.x,
+        0, 1, 0, worldPos.y,
+        0, 0, 1, worldPos.z,
+        0, 0, 0, -1
+    );    
+    
+    VisibleVoxelMatrix[index] = tranformationMatrix;
+    VoxelVisibility[index] = 1;
+}

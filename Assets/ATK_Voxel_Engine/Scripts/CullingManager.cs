@@ -30,8 +30,8 @@ namespace ATKVoxelEngine
 
             foreach (var b in ChunkManager.Chunks)
             {
-                bool render = GeometryUtility.TestPlanesAABB(planes, b.Value.Bounds);
-                b.Value.Renderer.enabled = render;
+                //bool render = GeometryUtility.TestPlanesAABB(planes, b.Value.Bounds);
+               // b.Value.Renderer.enabled = render;
             }
         }
     }

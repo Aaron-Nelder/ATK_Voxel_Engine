@@ -1,5 +1,5 @@
-using System;
 using UnityEngine;
+using Unity.Mathematics;
 
 namespace ATKVoxelEngine
 {
@@ -9,17 +9,20 @@ namespace ATKVoxelEngine
         [SerializeField] GameObject _chunkPrefab;
         public GameObject ChunkPrefab => _chunkPrefab;
 
-        [SerializeField] Vector3Int _chunkSize = new Vector3Int(16, 128, 16);
-        public Vector3Int ChunkSize => _chunkSize;
+        [SerializeField] int3 _chunkSize = new int3(16, 128, 16);
+        public int3 ChunkSize => _chunkSize;
 
-        [SerializeField] UInt16 _renderDistance = 4;
-        public UInt16 RenderDistance => _renderDistance;
+        [SerializeField] Bounds _chunkBounds = new Bounds(Vector3.zero, new Vector3(16, 128, 16));
+        public Bounds ChunkBounds => _chunkBounds;
+
+        [SerializeField] ushort _renderDistance = 4;
+        public ushort RenderDistance => _renderDistance;
 
         [SerializeField] int _seed = 0;
         public int Seed => _seed;
 
-        [SerializeField] Int16 _chunkTickRate = 1000;
-        public Int16 ChunkTickRate => _chunkTickRate;
+        [SerializeField] short _chunkTickRate = 1000;
+        public short ChunkTickRate => _chunkTickRate;
 
         [SerializeField] NoiseProfile_SO _heightNoise;
         public NoiseProfile_SO HeightNoise => _heightNoise;

@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9dac93a8cdb4a0419b2a60132bdd489, type: 3}
   m_Name: CaveNoise
   m_EditorClassIdentifier: 
-  _scale: 200
-  _amplitude: 0.1
-  _frequency: 0.1
+  _scale: 5
+  _amplitude: 2.5
+  _frequency: 0.5
   _octaves: 4
   _lacunarity: 2
-  _persistance: 0.5
-  _magClamp: 13
+  _persistance: 1
+  _magClamp: 0
   _useThreshold: 1
-  _threshold: {x: 1, y: 5}
+  _threshold:
+    x: 0.25
+    y: 0.75

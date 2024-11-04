@@ -1,5 +1,6 @@
 using UnityEngine.UIElements;
 using UnityEditor;
+using UnityEditor.UIElements;
 
 namespace ATKVoxelEngine
 {
@@ -25,22 +26,19 @@ namespace ATKVoxelEngine
 
             }
 
-            if (_target)
+            if (_target != null)
             {
                 Label name = _inspector.Q<Label>("Header");
                 name.text = _target.name;
 
                 // toggle the threshold slider on and off based on the toggle
-                Toggle useThreshold = _inspector.Q<Toggle>("Threshold");
-                MinMaxSlider threshold = _inspector.Q<MinMaxSlider>("ThresholdSlider");
-                Vector2Field thresholdValue = _inspector.Q<Vector2Field>("ThresholdLabel");
-                threshold.style.display = _target.UseThreshold ? DisplayStyle.Flex : DisplayStyle.None;
-                thresholdValue.style.display = _target.UseThreshold ? DisplayStyle.Flex : DisplayStyle.None;
+                Toggle useThreshold = _inspector.Q<Toggle>("UseThreshold");
+                PropertyField threshold = _inspector.Q<PropertyField>("Threshold");
+                threshold.label = "";
 
                 useThreshold.RegisterValueChangedCallback((evt) =>
                 {
                     threshold.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
-                    thresholdValue.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
                 });
             }
 

@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using UnityEngine;
+using Unity.Mathematics;
 
 namespace ATKVoxelEngine
 {
@@ -42,6 +43,15 @@ namespace ATKVoxelEngine
             ObjectField chunkPrefab = _inspector.Q<ObjectField>("ChunkPrefab");
             ObjectField heightNoiseSO = _inspector.Q<ObjectField>("HeightNoise");
             ObjectField chunkNoiseSO = _inspector.Q<ObjectField>("ChunkNoise");
+
+            PropertyField chunkSize = _inspector.Q<PropertyField>("ChunkSize");
+            BoundsField chunkBounds = _inspector.Q<BoundsField>("ChunkBounds");
+
+            chunkSize.RegisterValueChangeCallback(evt =>
+            {
+                Vector3 newVal = new Vector3(settings.ChunkSize.x, settings.ChunkSize.y, settings.ChunkSize.z);
+                _inspector.Q<BoundsField>("ChunkBounds").value = new Bounds(newVal / 2, newVal);
+            });
 
             // Spawn the world settings menu
             NoiseProfileEditor heightEditor = CreateInstance<NoiseProfileEditor>();

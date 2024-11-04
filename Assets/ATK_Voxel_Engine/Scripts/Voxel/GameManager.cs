@@ -27,7 +27,7 @@ namespace ATKVoxelEngine
                 return;
 
             _cachedTickRate = EngineSettings.WorldSettings.ChunkTickRate;
-            ChunkManager.SpawnStartingChunks(transform, false);
+            ChunkManager.SpawnStartingChunks(transform);
             new Selector();
         }
 
@@ -40,9 +40,7 @@ namespace ATKVoxelEngine
         {
             if (PlayerManager.Instance == null) return;
 
-            Vector3 newPos = new Vector3(EngineSettings.WorldSettings.ChunkSize.x / 2, 0, EngineSettings.WorldSettings.ChunkSize.z / 2);
-            PlayerManager.Instance.transform.position = newPos;
-            PlayerHelper.SnapPlayerToSurface();
+            PlayerHelper.SnapPlayerToVoxel(ChunkManager.Chunks[new(0,0)], EngineSettings.WorldSettings.ChunkSize.x / 2, EngineSettings.WorldSettings.ChunkSize.z / 2);
         }
 
         void FixedUpdate()

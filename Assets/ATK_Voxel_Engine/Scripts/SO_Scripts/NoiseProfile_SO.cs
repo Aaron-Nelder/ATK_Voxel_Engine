@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Mathematics;
 
 namespace ATKVoxelEngine
 {
@@ -29,7 +30,7 @@ namespace ATKVoxelEngine
         [SerializeField] bool _useThreshold = false;
         public bool UseThreshold => _useThreshold;
 
-        [SerializeField] Vector2 _threshold = new Vector2(0.45f,1);
-        public Vector2 Threshold => _threshold;
+        [SerializeField] float2 _threshold = new float2(0.45f, 1);
+        public float2 Threshold => _threshold;
     }
 }
