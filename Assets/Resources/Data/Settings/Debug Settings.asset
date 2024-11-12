@@ -40,3 +40,4 @@ MonoBehaviour:
     color: {r: 0, g: 1, b: 0.83348227, a: 1}
   debugLinePrefab: {fileID: 898214535967182340, guid: f343826a6d77fa143a5ea859f97f89ee,
     type: 3}
+  wireframeMaterial: {fileID: 2100000, guid: 3ff2d4f4fc92f4d429fa7f019dccc1d7, type: 2}

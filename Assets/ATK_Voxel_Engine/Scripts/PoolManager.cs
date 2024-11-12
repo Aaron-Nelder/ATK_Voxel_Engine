@@ -1,30 +1,39 @@
 using System;
 using UnityEngine;
 using UnityEngine.Pool;
+using Unity.Mathematics;
 
-public class PoolManager : MonoBehaviour
+namespace ATKVoxelEngine
 {
-    [SerializeField] Poolable _chunkPoolable;
-    public ObjectPool<GameObject> ChunkOBJPool;
-
-    public void SetupPools()
+    public class PoolManager : MonoBehaviour
     {
-        ChunkOBJPool = new ObjectPool<GameObject>(
-            createFunc: () => Instantiate(_chunkPoolable.prefab),
-            actionOnGet: obj => obj.gameObject.SetActive(true),
-            actionOnRelease: obj => obj.gameObject.SetActive(false),
-            actionOnDestroy: obj => Destroy(obj.gameObject),
-            collectionCheck: false,
-            defaultCapacity: _chunkPoolable.initialCapacity,
-            maxSize: _chunkPoolable.maxSize
-        );
-    }
-}
+        [SerializeField] Poolable _chunkPoolable;
+        public ObjectPool<GameObject> ChunkOBJPool;
 
-[Serializable]
-public struct Poolable
-{
-    public GameObject prefab;
-    public int initialCapacity;
-    public int maxSize;
+        public void SetupPools()
+        {
+            ushort renderDistance = EngineSettings.WorldSettings.RenderDistance;
+            int defaultCapacity = (renderDistance * renderDistance) + renderDistance;
+            int maxCapacity = defaultCapacity * 2;
+
+            ChunkOBJPool = new ObjectPool<GameObject>(
+                createFunc: () => Instantiate(_chunkPoolable.prefab),
+                actionOnGet: obj => obj.gameObject.SetActive(true),
+                actionOnRelease: obj => obj.gameObject.SetActive(false),
+                actionOnDestroy: obj => Destroy(obj.gameObject),
+                collectionCheck: false,
+                defaultCapacity: defaultCapacity,
+                maxSize: maxCapacity
+            );
+        }
+    }
+
+    [Serializable]
+    public struct Poolable
+    {
+        public GameObject prefab;
+        //TODO: THESE DON'T DO ANYTHING FOR CHUNKS
+        public int initialCapacity;
+        public int maxSize;
+    }
 }

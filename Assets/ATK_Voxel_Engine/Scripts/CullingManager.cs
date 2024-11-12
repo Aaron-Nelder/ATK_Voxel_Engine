@@ -26,7 +26,7 @@ namespace ATKVoxelEngine
 
         void CullChunksCPU()
         {
-            UnityEngine.Plane[] planes = GeometryUtility.CalculateFrustumPlanes(PlayerManager.Instance.PlayerCamera.Camera);
+            UnityEngine.Plane[] planes = GeometryUtility.CalculateFrustumPlanes(PlayerManager.Instance.PlayerCamera);
 
             foreach (var b in ChunkManager.Chunks)
             {

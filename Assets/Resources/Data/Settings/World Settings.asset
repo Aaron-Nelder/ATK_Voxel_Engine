@@ -23,6 +23,5 @@ MonoBehaviour:
     m_Extent: {x: 8, y: 64, z: 8}
   _renderDistance: 16
   _seed: 1
-  _chunkTickRate: 1000
   _heightNoise: {fileID: 11400000, guid: 7123f36e818c008439e9c843194f18b4, type: 2}
   _caveNoise: {fileID: 11400000, guid: 187ab8501b29a1f4e9ffa7bb8db8aa5a, type: 2}

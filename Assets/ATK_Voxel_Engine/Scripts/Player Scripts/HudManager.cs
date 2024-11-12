@@ -11,11 +11,18 @@ namespace ATKVoxelEngine
         VisualElement _debugElements;
         VisualElement _staminaBar;
 
-        void Awake()
+        bool _initialized;
+
+        public void Initialize()
         {
+            _hudDocument.enabled = true;
             new ScreenLogger(_hudDocument);
             AssignElements();
             EnableDebugging(DebugHelper.Debugging);
+            _initialized = true;
+
+            DebugHelper.OnDebugging += EnableDebugging;
+            PlayerManager.Instance.MotionHandler.StamController.OnStaminaChanged += OnStaminaChanged;        
         }
 
         void AssignElements()
@@ -27,12 +34,14 @@ namespace ATKVoxelEngine
 
         void OnEnable()
         {
+            if (!_initialized) return;
             DebugHelper.OnDebugging += EnableDebugging;
             PlayerManager.Instance.MotionHandler.StamController.OnStaminaChanged += OnStaminaChanged;
         }
 
         void OnDisable()
         {
+            if (!_initialized) return;
             DebugHelper.OnDebugging -= EnableDebugging;
             PlayerManager.Instance.MotionHandler.StamController.OnStaminaChanged -= OnStaminaChanged;
         }

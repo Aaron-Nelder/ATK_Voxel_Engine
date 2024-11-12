@@ -81,7 +81,7 @@
                     "name": "DebugCam",
                     "type": "Button",
                     "id": "78134a92-3b1b-424a-b660-6c3427bc11ad",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false

@@ -1,16 +1,51 @@
 .HeaderDivider {
     flex-grow: 0;
     background-image: url("project://database/Assets/ATK_Voxel_Engine/Sprites/UI/Pixel.png?fileID=2800000&guid=37691d69bd7aee54894170dc948ede79&type=3#Pixel");
-    height: 15px;
-    flex-basis: 10px;
+    height: 10px;
+    flex-basis: auto;
     min-width: 0;
     min-height: 0;
-    max-width: none;
-    max-height: 43px;
+    max-width: 100%;
+    max-height: 25px;
     flex-shrink: 0;
-    -unity-background-image-tint-color: rgb(151, 111, 229);
-    -unity-text-outline-color: rgb(122, 255, 102);
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    -unity-text-outline-color: rgba(0, 0, 0, 0);
     padding-bottom: 15px;
     margin-bottom: 10px;
-    color: rgb(151, 111, 229);
+    color: rgb(255, 255, 255);
+}
+
+.SOHeader {
+    -unity-font-style: bold;
+    font-size: 32px;
+    background-color: rgba(255, 151, 35, 0);
+    color: rgb(255, 151, 35);
+    overflow: hidden;
+    -unity-font-definition: url("project://database/Packages/com.unity.render-pipelines.core/Runtime/Debugging/Prefabs/Fonts/PerfectDOSVGA437.ttf?fileID=12800000&guid=74a5091d8707f334b9a5c31ef71a64ba&type=3#PerfectDOSVGA437");
+}
+
+.DefaultDivider {
+    flex-grow: 0;
+    background-color: rgb(255, 255, 255);
+    background-image: url("project://database/Assets/ATK_Voxel_Engine/Sprites/UI/Pixel.png?fileID=2800000&guid=37691d69bd7aee54894170dc948ede79&type=3#Pixel");
+    width: 95%;
+    height: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    align-self: center;
+    flex-shrink: 0;
+}
+
+.DefaultFoldOut {
+    font-size: 20px;
+    -unity-font-definition: url("project://database/Assets/ATK_Voxel_Engine/Fonts/PerfectDOSVGA437.ttf?fileID=12800000&guid=bf3877327f1efc64cbec8f1c14e20eb3&type=3#PerfectDOSVGA437");
+    -unity-font-style: bold;
+    margin-left: 10px;
+}
+
+.DefaultLabel {
+    align-content: auto;
+    align-items: stretch;
+    font-size: 20px;
+    -unity-font-definition: url("project://database/Assets/ATK_Voxel_Engine/Fonts/PerfectDOSVGA437.ttf?fileID=12800000&guid=bf3877327f1efc64cbec8f1c14e20eb3&type=3#PerfectDOSVGA437");
 }

@@ -2,7 +2,6 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using UnityEngine;
-using Unity.Mathematics;
 
 namespace ATKVoxelEngine
 {
@@ -40,12 +39,10 @@ namespace ATKVoxelEngine
             }
 
             _target = settings;
-            ObjectField chunkPrefab = _inspector.Q<ObjectField>("ChunkPrefab");
-            ObjectField heightNoiseSO = _inspector.Q<ObjectField>("HeightNoise");
-            ObjectField chunkNoiseSO = _inspector.Q<ObjectField>("ChunkNoise");
 
+            ObjectField heightNoiseSO = _inspector.Q<ObjectField>("HeightNoise");
+            ObjectField chunkNoiseSO = _inspector.Q<ObjectField>("CaveNoise");
             PropertyField chunkSize = _inspector.Q<PropertyField>("ChunkSize");
-            BoundsField chunkBounds = _inspector.Q<BoundsField>("ChunkBounds");
 
             chunkSize.RegisterValueChangeCallback(evt =>
             {
@@ -53,38 +50,39 @@ namespace ATKVoxelEngine
                 _inspector.Q<BoundsField>("ChunkBounds").value = new Bounds(newVal / 2, newVal);
             });
 
-            // Spawn the world settings menu
-            NoiseProfileEditor heightEditor = CreateInstance<NoiseProfileEditor>();
-            heightEditor.InitElements(_target.HeightNoise);
-            _heightVE = heightEditor.CreateInspectorGUI();
-            _heightVE.Bind(new SerializedObject(_target.HeightNoise));
-            _inspector.Add(_heightVE);
-
-            // Spawn the world settings menu
-            NoiseProfileEditor caveEditor = CreateInstance<NoiseProfileEditor>();
-            heightEditor.InitElements(_target.CaveNoise);
-            VisualElement ce = heightEditor.CreateInspectorGUI();
-            ce.Bind(new SerializedObject(_target.CaveNoise));
-            _inspector.Add(ce);
-
             heightNoiseSO.RegisterValueChangedCallback((evt) =>
             {
-                if (evt.newValue is null)
-                    _heightVE.style.display = DisplayStyle.None;
+                if (evt.newValue is null && _heightVE != null)
+                    _heightVE.RemoveFromHierarchy();
                 else if (evt.newValue is not null)
                 {
+                    if (_heightVE != null)
+                        _heightVE.RemoveFromHierarchy();
+                    NoiseProfileEditor heightEditor = CreateInstance<NoiseProfileEditor>();
+                    heightEditor.InitElements(_target.HeightNoise);
+                    _heightVE = heightEditor.CreateInspectorGUI();
                     _heightVE.Bind(new SerializedObject(_target.HeightNoise));
+                    _inspector.Add(_heightVE);
                     _heightVE.style.display = DisplayStyle.Flex;
                 }
             });
 
             chunkNoiseSO.RegisterValueChangedCallback((evt) =>
             {
-                if (evt.newValue is null)
-                    _caveVE.style.display = DisplayStyle.None;
+                if (evt.newValue is null && _caveVE != null)
+                {
+                    _caveVE.RemoveFromHierarchy();
+                }
                 else if (evt.newValue is not null)
                 {
+
+                    if (_caveVE != null)
+                        _caveVE.RemoveFromHierarchy();
+                    NoiseProfileEditor caveEditor = CreateInstance<NoiseProfileEditor>();
+                    caveEditor.InitElements(_target.CaveNoise);
+                    _caveVE = caveEditor.CreateInspectorGUI();
                     _caveVE.Bind(new SerializedObject(_target.CaveNoise));
+                    _inspector.Add(_caveVE);
                     _caveVE.style.display = DisplayStyle.Flex;
                 }
             });

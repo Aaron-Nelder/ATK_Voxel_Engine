@@ -24,36 +24,38 @@ namespace ATKVoxelEngine
         void Start()
         {
             //TODO:: Change this to a proper voxel / Inventory system
-            _heldVoxel = Instantiate(_heldVoxelPrefab, _heldAnchor).GetComponent<HeldVoxel>().Init(_heldAnchor, EngineSettings.VoxelAtlas[1]);
+            _heldVoxel = Instantiate(_heldVoxelPrefab, _heldAnchor).GetComponent<HeldVoxel>().Init(_heldAnchor, EngineSettings.VoxelAtlas[2]);
 
             _breakSpeed = PlayerManager.Instance.Stats.BreakSpeed;
             _placeSpeed = PlayerManager.Instance.Stats.PlaceSpeed;
+
+            new VoxelHighlight();
         }
 
         void Update()
         {
-            if (_isLeftClick && Selector.IsSelecting)
+            if (_isLeftClick && Selector.HasSelection)
             {
                 if (_breakTimer >= _breakSpeed)
                 {
-                    WorldHelper.DestroyVoxel(WorldHelper.LocalPosToWorldPos(Selector.SelectedVoxel.Chunk.Position, Selector.SelectedVoxel.LocalPosition));
+                    EngineUtilities.DestroyVoxel(EngineUtilities.LocalPosToWorldPos(Selector.SelectedVoxel.Chunk.Position, Selector.SelectedVoxel.LocalPosition));
                     _breakTimer = 0;
                 }
                 else
                     _breakTimer += Time.deltaTime;
             }
-            else if (_isRightClick && Selector.IsSelecting)
+            else if (_isRightClick && Selector.HasSelection)
             {
                 if (_placeTimer >= _placeSpeed)
                 {
                     _animator.SetBool(_breakingHash, true);
-                    WorldHelper.PlaceVoxel(Selector.SelectedVoxel.NormalWorldPos, _heldVoxel.Id);
+                    EngineUtilities.PlaceVoxel(Selector.SelectedVoxel.NormalWorldPos, _heldVoxel.Id);
                     _placeTimer = 0;
                 }
                 else
                     _placeTimer += Time.deltaTime;
             }
-            else if (_isRightClick && !Selector.IsSelecting)
+            else if (_isRightClick && !Selector.HasSelection)
             {
                 _animator.SetBool(_breakingHash, false);
                 _placeTimer = _placeSpeed;

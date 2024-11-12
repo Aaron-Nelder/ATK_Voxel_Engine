@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style src="project://database/Assets/Editor/GlobalEditorStyle.uss?fileID=7433441132597879392&amp;guid=6fdcdce3411945c4fae5d27d05b7a13a&amp;type=3#GlobalEditorStyle" />
+    <ui:Label text="Label" name="Title" class="SOHeader" style="overflow: hidden;" />
+    <ui:VisualElement name="Divider" class="HeaderDivider" style="flex-grow: 1; color: rgb(255, 151, 35); -unity-background-image-tint-color: rgb(255, 151, 35); overflow: visible; visibility: visible;" />
+    <ui:GroupBox style="flex-direction: row; align-self: auto; align-content: auto; flex-shrink: 1; flex-grow: 1; align-items: auto; margin-top: -19px;">
+        <ui:GroupBox style="flex-direction: column; width: 50%; align-items: flex-start; align-self: flex-start; justify-content: flex-start; align-content: auto; flex-shrink: 1; flex-grow: 1;">
+            <ui:GroupBox name="MatMesh" style="flex-direction: row; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-bottom: 0; padding-left: 0; width: 50%; align-self: flex-start; justify-content: flex-start;">
+                <uie:ObjectField label="Material" binding-path="_material" type="UnityEngine.Material, UnityEngine.CoreModule" name="Material" style="align-self: stretch; min-width: auto; max-width: none; width: auto; flex-direction: column; font-size: 18px; -unity-font-style: normal; -unity-text-align: upper-left; text-overflow: clip; white-space: normal; display: flex; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; align-content: stretch; justify-content: space-evenly; flex-shrink: 1; flex-grow: 1;" />
+                <uie:ObjectField label="Mesh" binding-path="_mesh" type="UnityEngine.Mesh, UnityEngine.CoreModule" name="Mesh" style="flex-direction: column; font-size: 18px; margin-left: 5px; margin-bottom: 0; margin-right: 0; margin-top: 0; width: auto; justify-content: space-evenly; align-self: stretch; align-content: stretch; flex-shrink: 1; flex-grow: 1;" />
+            </ui:GroupBox>
+            <ui:GroupBox name="Toggles" style="flex-direction: row; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; background-color: rgb(94, 94, 94); flex-grow: 1; flex-shrink: 1; width: 50%;">
+                <ui:Toggle label="Has Collision" name="HasCollision" binding-path="_hasCollision" style="font-size: 18px; justify-content: flex-start; overflow: visible; align-self: flex-start; align-items: center; align-content: flex-start; -unity-text-align: upper-right; width: auto; margin-right: 0; margin-left: 0; margin-top: 0; margin-bottom: 0; flex-shrink: 1;" />
+                <ui:Toggle label="Is Solid" name="IsSolid" binding-path="_isSolid" style="font-size: 18px; flex-direction: row; overflow: visible; align-self: flex-start; align-items: center; align-content: flex-start; justify-content: flex-start; -unity-text-align: upper-right; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-left: 0; flex-grow: 1; padding-right: 0;" />
+            </ui:GroupBox>
+        </ui:GroupBox>
+        <ui:VisualElement name="Icon" style="flex-direction: row; justify-content: flex-start; align-self: flex-start; align-content: auto; flex-basis: auto; font-size: 0; background-size: 100% 100%; -unity-background-scale-mode: stretch-to-fill; align-items: auto; margin-top: -19px; margin-right: 0; margin-bottom: 0; padding-right: 0; margin-left: 0; right: 0; min-width: auto; min-height: auto; flex-grow: 1; width: 150px; height: 150px; top: auto; background-position-x: right 0; background-position-y: top 0; position: absolute;" />
+    </ui:GroupBox>
+    <uie:PropertyField binding-path="_meshPlanes" label="Mesh Planes" name="MeshPlanes" style="padding-top: 20px; font-size: 18px;" />
+    <ui:GroupBox style="flex-direction: row; align-self: stretch; justify-content: space-evenly; align-content: stretch;">
+        <ui:Button text="Save Mesh" name="SaveMeshButton" style="justify-content: space-evenly; align-self: stretch; align-content: stretch; flex-shrink: 1; flex-grow: 1; font-size: 18px;" />
+        <ui:Button text="Bake Data" name="BakeDataButton" style="justify-content: space-evenly; align-self: stretch; align-content: stretch; flex-shrink: 1; flex-grow: 1; font-size: 18px;" />
+        <ui:Button text="Modify Mesh" name="ModifyMesh" style="justify-content: space-evenly; align-self: stretch; align-content: stretch; flex-shrink: 1; flex-grow: 1; font-size: 18px;" />
+    </ui:GroupBox>
+</ui:UXML>

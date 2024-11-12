@@ -115,7 +115,7 @@ namespace ATKVoxelEngine
             foreach (var key in _matricesDic.Keys)
             {
                 Mesh mesh = EngineSettings.VoxelAtlas[key].MeshData.Mesh;
-                Material material = EngineSettings.VoxelAtlas[key].MeshData.material;
+                Material material = EngineSettings.VoxelAtlas[key].MeshData.Material;
                 Graphics.DrawMeshInstanced(mesh, 0, material, _matricesDic[key]);
             }
         }

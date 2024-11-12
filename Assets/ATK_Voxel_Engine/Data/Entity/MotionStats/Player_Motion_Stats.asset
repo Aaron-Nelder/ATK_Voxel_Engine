@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Player_Motion_Stats
   m_EditorClassIdentifier: 
   _mass: 62
-  _drag: 1
-  _angularDrag: 0.05
+  _drag: 0
+  _angularDrag: 0
   _groundedLayers:
     serializedVersion: 2
     m_Bits: 9
   _skinWidth: 0.1
   _moveSpeedMul: 1
-  _gravity: 5
+  _size: {x: 0.9, y: 1.8, z: 0.9}

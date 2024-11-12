@@ -14,6 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _staminaStats: {fileID: 11400000, guid: ff666e66c8bc10148a659e4e1b4010f3, type: 2}
   _motion: {fileID: 11400000, guid: fe426ab51386d594599e7eb71ae72fda, type: 2}
-  _breakSpeed: 0.1
-  _placeSpeed: 0.1
-  _height: 2
+  _breakSpeed: 1
+  _placeSpeed: 1

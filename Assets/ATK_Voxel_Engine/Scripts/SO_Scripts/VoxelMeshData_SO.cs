@@ -2,49 +2,42 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Collections;
 using System.Runtime.InteropServices;
-using System.Linq;
+using System;
 
 namespace ATKVoxelEngine
 {
-    [CreateAssetMenu(fileName = "New_CustomMesh", menuName = EngineConstants.ENGINE_NAME + "/ New_CustomMesh")]
+    [CreateAssetMenu(fileName = "New_CustomMesh", menuName = EngineConstants.ENGINE_NAME + "/Custom Mesh")]
     public class VoxelMeshData_SO : ScriptableObject
     {
-        public MeshPlane[] MeshPlanes;
-        public bool usesCollisions;
-        public bool isTransparent;
-        public Material material;
-        public Mesh Mesh;
+        [SerializeField] MeshPlane[] _meshPlanes;
+        public MeshPlane[] MeshPlanes => _meshPlanes;
 
-        [SerializeField] Vertex[] _vertexData;
-        [SerializeField] uint[] _indexData;
+        [SerializeField] bool _hasCollision = true;
+        public bool HasCollision => _hasCollision;
 
-        public Vertex[] GetVertices()
+        [SerializeField] bool _isSolid = true;
+        public bool IsSolid => _isSolid;
+
+        [SerializeField] Material _material;
+        public Material Material => _material;
+
+        [SerializeField] Mesh _mesh;
+        public Mesh Mesh => _mesh;
+
+        public Mesh MeshInstance => Instantiate(Mesh);
+
+        public static void SpawnMeshForEdit(VoxelMeshData_SO meshData)
         {
-            Vertex[] vertices = new Vertex[MeshPlanes.Length * MeshPlane.VERTEX_COUNT];
-            for (int i = 0; i < MeshPlanes.Length; i++)
-                for (int j = 0; j < MeshPlane.VERTEX_COUNT; j++)
-                    vertices[i * MeshPlane.VERTEX_COUNT + j] = MeshPlanes[i].Vertices[j];
+            GameObject go = new GameObject(meshData.name);
+            go.tag = EngineConstants.CUSTOM_MESH_TAG;
 
-            return vertices;
-        }
-
-        public uint[] GetIndices()
-        {
-            uint[] indices = new uint[MeshPlanes.Length * MeshPlane.INDEX_COUNT];
-            uint vOffset = 0;
-            for (int i = 0; i < MeshPlanes.Length; i++)
-            {
-                for (int j = 0; j < MeshPlane.INDEX_COUNT; j++)
-                    indices[i * MeshPlane.INDEX_COUNT + j] = MeshPlane.Indices[j] + vOffset;
-
-                vOffset += MeshPlane.VERTEX_COUNT;
-            }
-
-            return indices;
+            go.AddComponent<MeshFilter>().mesh = meshData.Mesh;
+            go.AddComponent<MeshRenderer>().material = meshData.Material;
+            go.AddComponent<CustomMeshReference>().MeshData = meshData;
         }
 
         [ContextMenu("Save Mesh")]
-        public void SaveMesh()
+        public Mesh SaveMesh()
         {
             NativeArray<float3> Vertices = new NativeArray<float3>(MeshPlanes.Length * 4, Allocator.Temp);
             NativeArray<uint> Indices = new NativeArray<uint>(MeshPlanes.Length * 6, Allocator.Temp);
@@ -67,14 +60,17 @@ namespace ATKVoxelEngine
                 }
             }
 
-            Mesh = new Mesh();
-            Mesh.name = "New Mesh";
-            Mesh.SetVertices(Vertices);
-            Mesh.SetIndices(Indices, MeshTopology.Triangles, 0);
-            Mesh.SetNormals(Normals);
-            Mesh.SetUVs(0, UVS);
-            Mesh.RecalculateBounds();
-            Mesh.RecalculateTangents();
+            if (_mesh == null)
+            {
+                _mesh = new Mesh();
+                _mesh.name = "New Mesh";
+            }
+            _mesh.SetVertices(Vertices);
+            _mesh.SetIndices(Indices, MeshTopology.Triangles, 0);
+            _mesh.SetNormals(Normals);
+            _mesh.SetUVs(0, UVS);
+            _mesh.RecalculateBounds();
+            _mesh.RecalculateTangents();
 
             Vertices.Dispose();
             Indices.Dispose();
@@ -82,8 +78,22 @@ namespace ATKVoxelEngine
             UVS.Dispose();
 
 #if UNITY_EDITOR
-            UnityEditor.AssetDatabase.CreateAsset(Mesh, "Assets/ATK_Voxel_Engine/Meshes/NewMesh.asset");
+
+            string path = UnityEditor.AssetDatabase.GetAssetPath(_mesh);
+
+            if (String.IsNullOrEmpty(path))
+            {
+                path = UnityEditor.EditorUtility.SaveFilePanelInProject("Save Mesh", "New Mesh", "asset", "Save Mesh");
+                if (path.Length == 0)
+                    return null;
+            }
+
+            UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.AssetDatabase.SaveAssetIfDirty(_mesh);
+            UnityEditor.AssetDatabase.SaveAssets();
 #endif
+
+            return _mesh;
         }
 
         [ContextMenu("Bake Data")]
@@ -95,12 +105,10 @@ namespace ATKVoxelEngine
                 for (int i = 0; i < uvs.Length; i++)
                     plane.Vertices[i].texCoord0 = uvs[i];
             }
-
-            _vertexData = GetVertices();
-            _indexData = GetIndices();
         }
 
-        public Vertex[] GetPlanes(float3 normal)
+        // returns the verticies that have the same normal
+        public Vertex[] GetPlanesFromNormal(float3 normal)
         {
             int vertexCount = 0;
 
@@ -145,11 +153,6 @@ namespace ATKVoxelEngine
             }
         }
 
-        bool IsPlaneVisible(int visibleSides, int planeIndex, float3 direction)
-        {
-            return WorldHelper.IsBitSet(visibleSides, WorldHelper.DirectionToInt(direction)) && MeshPlanes[planeIndex].Vertices[0].normal.Equals(direction);
-        }
-
         // returns and array of plane indecies that are visible, -1 if the plane is not visible
         int[] GetVisiblePlaneIndecies(int visibleSides)
         {
@@ -157,17 +160,17 @@ namespace ATKVoxelEngine
 
             for (int i = 0; i < MeshPlanes.Length; i++)
             {
-                if (IsPlaneVisible(visibleSides, i, WorldHelper.FaceToVec(Face.TOP)))
+                if (IsPlaneVisible(visibleSides, i, EngineUtilities.FaceToVec(Face.TOP)))
                     indecies[i] = 0;
-                else if (IsPlaneVisible(visibleSides, i, WorldHelper.FaceToVec(Face.BOTTOM)))
+                else if (IsPlaneVisible(visibleSides, i, EngineUtilities.FaceToVec(Face.BOTTOM)))
                     indecies[i] = 1;
-                else if (IsPlaneVisible(visibleSides, i, WorldHelper.FaceToVec(Face.LEFT)))
+                else if (IsPlaneVisible(visibleSides, i, EngineUtilities.FaceToVec(Face.LEFT)))
                     indecies[i] = 2;
-                else if (IsPlaneVisible(visibleSides, i, WorldHelper.FaceToVec(Face.RIGHT)))
+                else if (IsPlaneVisible(visibleSides, i, EngineUtilities.FaceToVec(Face.RIGHT)))
                     indecies[i] = 3;
-                else if (IsPlaneVisible(visibleSides, i, WorldHelper.FaceToVec(Face.FRONT)))
+                else if (IsPlaneVisible(visibleSides, i, EngineUtilities.FaceToVec(Face.FRONT)))
                     indecies[i] = 4;
-                else if (IsPlaneVisible(visibleSides, i, WorldHelper.FaceToVec(Face.BACK)))
+                else if (IsPlaneVisible(visibleSides, i, EngineUtilities.FaceToVec(Face.BACK)))
                     indecies[i] = 5;
                 else
                     indecies[i] = -1;
@@ -175,6 +178,8 @@ namespace ATKVoxelEngine
 
             return indecies;
         }
+
+        bool IsPlaneVisible(int visibleSides, int planeIndex, float3 direction) => EngineUtilities.IsBitSet(visibleSides, EngineUtilities.DirectionToInt(direction)) && MeshPlanes[planeIndex].Vertices[0].normal.Equals(direction);
     }
 
     [System.Serializable]
@@ -207,5 +212,10 @@ namespace ATKVoxelEngine
             this.normal = normal;
             this.texCoord0 = texCoord0;
         }
+
+        public override string ToString() =>
+            $"\n    Position: ({position.x},{position.y},{position.z})" +
+            $"\n    Normal: ({normal.x},{normal.y},{normal.z})" +
+            $"\n    UV: ({texCoord0.x},{texCoord0.y})";
     }
 }

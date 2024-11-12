@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 namespace ATKVoxelEngine
 {
-    [CreateAssetMenu(fileName = "StaminaStats", menuName = EngineConstants.ENGINE_NAME + "/Noise Profile")]
+    [CreateAssetMenu(fileName = "Noise Profile", menuName = EngineConstants.ENGINE_NAME + "/Noise Profile")]
     public class NoiseProfile_SO : ScriptableObject
     {
         [SerializeField] float _scale = 200.0f;

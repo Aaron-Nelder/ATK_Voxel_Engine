@@ -4,11 +4,9 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - DebugCanvas
+  - EngineManager
   - Chunk
-  - Mesh Preview
-  - VoxelManager
-  - WorldGenerator
+  - CustomMesh
   layers:
   - Default
   - TransparentFX

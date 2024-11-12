@@ -3,59 +3,57 @@ using UnityEngine;
 
 namespace ATKVoxelEngine
 {
-    public class Selector : IUpdate
+    public static class Selector
     {
-        public UpdateType UpdateType => UpdateType.FixedUpdate;
+        static Vector2 _screenCenter = new(Screen.width / 2, Screen.height / 2);
+        static Camera _cam;
 
-        Vector3 _screenCenter = new(Screen.width / 2, Screen.height / 2, 0);
-        float _tickTimer = 0;
-        float _tickRate = 0.1f;
-        Camera _cam;
+        public static VoxelCastHit SelectedVoxel { get; private set; }
+        public static bool HasSelection { get; private set; }
+        public static event Action<VoxelCastHit> OnSelect;
+        public static event Action<VoxelCastHit> OnDeselect;
 
-        public static SelectedVoxel SelectedVoxel { get; private set; }
-        public static bool IsSelecting { get; private set; }
-        public static event Action<SelectedVoxel> OnSelect;
-        public static event Action<SelectedVoxel> OnDeselect;
-
-        public Selector()
+        public static void Register()
         {
-            _cam = PlayerManager.Instance.PlayerCamera.Camera;
-            // Registering the selector to the update manager
-            UpdateManager.Register(this);
+            _cam = PlayerManager.Instance.PlayerCamera;
+            TickRateManager.OnFixedUpdate += Update;
         }
 
-        public void Update(float deltaTime)
+        public static void UnRegister()
         {
-            _tickTimer += deltaTime;
-            if (_tickTimer < _tickRate) return;
-            _tickTimer = 0;
+            TickRateManager.OnFixedUpdate -= Update;
+        }
+
+        public static void Update(float deltaTime)
+        {
+            _screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
 
             // Checks if the ray hits a voxel
-            bool selecting = WorldHelper.VoxelCast(_cam.ScreenPointToRay(_screenCenter), out SelectedVoxel newVoxel);
+            bool hitVoxel = EngineUtilities.VoxelCast(_cam.ScreenPointToRay(_screenCenter), out VoxelCastHit voxel);
 
-            if (selecting != IsSelecting)
+            if (hitVoxel != HasSelection)
             {
-                IsSelecting = selecting;
+                HasSelection = hitVoxel;
 
-                if (!IsSelecting)
+                if (!HasSelection)
                 {
                     OnDeselect?.Invoke(SelectedVoxel);
-                    SelectedVoxel = newVoxel;
+                    SelectedVoxel = voxel;
                     return;
                 }
+                else
+                    CheckForSelection(voxel);
             }
 
-            if (newVoxel.Id == 0) return;
+            if (voxel.Id == 0) return;
 
-            if (!SelectedVoxel.Equals(newVoxel))
-            {
-                OnSelect?.Invoke(SelectedVoxel = newVoxel);
-            }
+            CheckForSelection(voxel);
         }
 
-        ~Selector()
+        static void CheckForSelection(VoxelCastHit selectedVoxel)
         {
-            UpdateManager.UnRegister(this);
+            if (!SelectedVoxel.Equals(selectedVoxel))
+                OnSelect?.Invoke(SelectedVoxel = selectedVoxel);
         }
     }
 }

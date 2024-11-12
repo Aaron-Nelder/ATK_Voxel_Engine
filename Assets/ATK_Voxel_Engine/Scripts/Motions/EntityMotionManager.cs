@@ -2,121 +2,101 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
-using ATKVoxelEngine;
 
-public class EntityMotionManager : MonoBehaviour
+namespace ATKVoxelEngine
 {
-    EntityMotionHandler _handler;
-
-    //  MotionReferences
-    [SerializeField] MotionGravity _gravityMotion;
-    [SerializeField] MotionMove _moveMotion;
-    [SerializeField] MotionLook _lookMotion;
-    [SerializeField] MotionCrouch _crouchMotion;
-    [SerializeField] MotionType[] _defaultMoveSet = new MotionType[] { MotionType.Moving, MotionType.Looking, MotionType.Gravity, MotionType.Crouching };
-
-    //dictionary that holds the current enabled motions
-    ConcurrentDictionary<MotionType, BaseMotion> EnabledMotions = new ConcurrentDictionary<MotionType, BaseMotion>();
-
-    void OnDebugMode() => DebugHelper.Debugging = !DebugHelper.Debugging;
-
-    public Action<BaseMotion> OnMotionEnabled;
-    public Action<BaseMotion> OnMotionDisabled;
-
-    public void Init(EntityMotionHandler handler, bool enableDefaultMoveset)
+    public class EntityMotionManager : MonoBehaviour
     {
-        _handler = handler;
-        if (enableDefaultMoveset)
-            EnableDefaultMoveset();
-    }
+        EntityMotionHandler _handler;
 
-    void EnableDefaultMoveset()
-    {
-        foreach (var motion in _defaultMoveSet)
-            EnableMotion(motion);
-    }
+        //MotionReferences
+        [SerializeField] MotionJump _jumpMotion;
+        [SerializeField] MotionMove _moveMotion;
+        [SerializeField] MotionLook _lookMotion;
+        [SerializeField] MotionCrouch _crouchMotion;
+        [SerializeField] MotionType[] _defaultMoveSet = new MotionType[] { MotionType.MOVE, MotionType.LOOK, MotionType.JUMP, MotionType.CROUCH };
 
-    public bool EnableMotion(MotionType motionType)
-    {
-        BaseMotion motion = GetMotion(motionType);
-        bool added = EnabledMotions.TryAdd(motionType, motion);
+        // sets the debugging mode and is being listened to from PlayerInput
+        void OnDebugMode() => DebugHelper.Debugging = !DebugHelper.Debugging;
 
-        if (added)
+        public Action<BaseMotion> OnMotionEnabled;
+        public Action<BaseMotion> OnMotionDisabled;
+
+        public void Init(EntityMotionHandler handler, bool enableDefaultMoveset)
         {
+            _handler = handler;
+            if (enableDefaultMoveset)
+                EnableDefaultMoveset();
+        }
+
+        void EnableDefaultMoveset()
+        {
+            foreach (var motion in _defaultMoveSet)
+                EnableMotion(motion);
+        }
+
+        public bool EnableMotion(MotionType motionType)
+        {
+            BaseMotion motion = GetMotion(motionType);
+
+            if (motion.IsEnabled) return false;
+
             motion.OnMotionEnabled(_handler);
             OnMotionEnabled?.Invoke(motion);
+
+            return true;
         }
 
-        return added;
-    }
-
-    public bool DisableMotion(MotionType motionType)
-    {
-        bool removed = EnabledMotions.TryRemove(motionType, out BaseMotion value);
-
-        if (removed)
+        public bool DisableMotion(MotionType motionType)
         {
-            value.OnMotionDisabled();
-            OnMotionDisabled?.Invoke(value);
-        }
-        return removed;
-    }
+            BaseMotion motion = GetMotion(motionType);
 
-    public BaseMotion GetMotion(MotionType motionType)
-    {
-        switch (motionType)
+            if (!motion.IsEnabled) return false;
+
+            motion.OnMotionDisabled();
+            OnMotionDisabled?.Invoke(motion);
+
+            return true;
+        }
+
+        public BaseMotion GetMotion(MotionType motionType)
         {
-            case MotionType.Gravity:
-                return _gravityMotion;
-            case MotionType.Moving:
-                return _moveMotion;
-            case MotionType.Looking:
-                return _lookMotion;
-            case MotionType.Crouching:
-                return _crouchMotion;
-            default:
-                Debug.LogError("Motion not found");
-                return null;
+            switch (motionType)
+            {
+                case MotionType.JUMP:
+                    return _jumpMotion;
+                case MotionType.MOVE:
+                    return _moveMotion;
+                case MotionType.LOOK:
+                    return _lookMotion;
+                case MotionType.CROUCH:
+                    return _crouchMotion;
+                default:
+                    Debug.LogError("Motion not found");
+                    return null;
+            }
         }
-    }
 
-    void Update()
-    {
-        foreach (var motion in EnabledMotions)
-            motion.Value.ProccessUpdate();
-    }
+        #region Editor
 
-    void FixedUpdate()
-    {
-        foreach (var motion in EnabledMotions)
-            motion.Value.ProccessFixedUpdate();
-    }
-
-    void LateUpdate()
-    {
-        foreach (var motion in EnabledMotions)
-            motion.Value.ProccessLateUpdate();
-    }
-
-    #region Editor
-
-    [ContextMenu("Find Motions")]
-    public void FindMotions()
-    {
-        _gravityMotion = transform.GetComponentInChildren<MotionGravity>();
-        _moveMotion = transform.GetComponentInChildren<MotionMove>();
-        _lookMotion = transform.GetComponentInChildren<MotionLook>();
-        _crouchMotion = transform.GetComponentInChildren<MotionCrouch>();
-
-        List<MotionType> mList = new List<MotionType>();
-
-        foreach (var motion in _defaultMoveSet)
+        [ContextMenu("Find Motions")]
+        public void FindMotions()
         {
-            if (GetMotion(motion) is not null)
-                mList.Add(motion);
-        }
+            _jumpMotion = transform.GetComponentInChildren<MotionJump>();
+            _moveMotion = transform.GetComponentInChildren<MotionMove>();
+            _lookMotion = transform.GetComponentInChildren<MotionLook>();
+            _crouchMotion = transform.GetComponentInChildren<MotionCrouch>();
 
-        _defaultMoveSet = mList.ToArray();
+            List<MotionType> mList = new List<MotionType>();
+
+            foreach (var motion in _defaultMoveSet)
+            {
+                if (GetMotion(motion) is not null)
+                    mList.Add(motion);
+            }
+
+            _defaultMoveSet = mList.ToArray();
+        }
+        #endregion
     }
-    #endregion
 }

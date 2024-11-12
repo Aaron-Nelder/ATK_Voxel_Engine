@@ -4,11 +4,12 @@ using System;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Jobs;
+using UnityEngine.Scripting;
 
 namespace ATKVoxelEngine
 {
     [RequireComponent(typeof(ChunkRenderManager))]
-    public class Chunk : MonoBehaviour
+    public class Chunk : MonoBehaviour , IDisposable
     {
         public ChunkPosition Position { get; private set; }
         public int3 WorldPosition { get; private set; }
@@ -72,7 +73,7 @@ namespace ATKVoxelEngine
         void Setup(ChunkPosition position)
         {
             Position = position;
-            WorldPosition = WorldHelper.ChunkPosToWorldPos(Position);
+            WorldPosition = EngineUtilities.ChunkPosToWorldPosInt3(Position);
             WorldSettings_SO settings = EngineSettings.WorldSettings;
             ChunkSize = settings.ChunkSize;
 
@@ -86,11 +87,8 @@ namespace ATKVoxelEngine
             DebugHelper.OnDebugging += OnDebugging;
             OnDebugging(DebugHelper.Debugging);
             Initialized = true;
-            ChunkManager.OnChunkLoaded?.Invoke(Position);
 
-            //TODO:: REMOVE THIS AND CHECK INSTEAD IF THE CHUNK IS AT 0,0, AND THE WORLD IS BEING GENEREATED ON STARTUP
-            if (Position == ChunkPosition.Zero)
-                GameManager.OnCenterChunkInit();
+            ChunkLoadManager.OnChunkLoaded(Position);
         }
 
         void GenerateTerrain(WorldSettings_SO settings)
@@ -101,7 +99,7 @@ namespace ATKVoxelEngine
             NativeArray<int> caveNoise = new NativeArray<int>(settings.ChunkSize.x * settings.ChunkSize.y * settings.ChunkSize.z, Allocator.TempJob);
             NativeArray<float> caveOctavesOffset = new NativeArray<float>(settings.CaveNoise.Octaves * 3, Allocator.TempJob);
 
-            JobHandle handle = new GenerateTerrainJob(ref _voxels, settings, WorldPosition, ref heightNoise, ref heightOctavesOffset, ref caveNoise, ref caveOctavesOffset).Schedule();
+            JobHandle handle = new GenerateTerrainJob(_voxels, settings, WorldPosition, heightNoise, heightOctavesOffset, caveNoise, caveOctavesOffset).Schedule();
             handle.Complete();
 
             heightNoise.Dispose();
@@ -110,7 +108,7 @@ namespace ATKVoxelEngine
             caveOctavesOffset.Dispose();
         }
 
-        public GameObject Dispose(bool isEditor = false)
+        public void Dispose()
         {
             DebugHelper.OnDebugging -= OnDebugging;
 
@@ -119,23 +117,16 @@ namespace ATKVoxelEngine
 
             ChunkManager.Chunks.TryRemove(Position, out _);
 
-            if (isEditor)
-            {
-                try
-                {
-                    GameObject.DestroyImmediate(gameObject);
-                }
-                catch (Exception e)
-                {
-                    Debug.Log(e);
-                }
-            }
+            if (Application.isEditor)
+                DestroyImmediate(gameObject);
             else
-            {
-                GameManager.Instance.Pool.ChunkOBJPool.Release(gameObject);
-            }
+                EngineManager.Instance.Pool.ChunkOBJPool.Release(gameObject);
+        }
 
-            return gameObject;
+        void OnDestroy()
+        {
+            if (_voxels.IsCreated)
+                _voxels.Dispose();
         }
 
         #region Debugging

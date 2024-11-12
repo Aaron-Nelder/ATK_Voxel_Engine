@@ -2,14 +2,15 @@ using System;
 using UnityEngine;
 using ATKVoxelEngine;
 
-public class StaminaController : IUpdate
+public class StaminaController : ITickable
 {
-    public UpdateType UpdateType => UpdateType.Update;
+    public TickType TickType => TickType.UPDATE;
 
     [SerializeField] StaminaStats_SO _stats;
     public StaminaStats_SO Stats => _stats;
 
     public float CurrentStamina { get; private set; }
+
     float _regenDelayTimer = 0.0f;
     float _lastTickTime = 0.0f;
     bool _isRegenDelay = false;
@@ -20,10 +21,25 @@ public class StaminaController : IUpdate
     {
         _stats = stats;
         CurrentStamina = stats.MaxStamina;
-        UpdateManager.Register(this);
+        Register();
     }
 
-    public void Update(float deltaTime)
+    ~StaminaController()
+    {
+        UnRegister();
+    }
+
+    public void Register()
+    {
+        TickRateManager.OnUpdate += Tick;
+    }
+
+    public void UnRegister()
+    {
+        TickRateManager.OnUpdate -= Tick;
+    }
+
+    protected void Tick(float deltaTime)
     {
         if (CurrentStamina == _stats.MaxStamina) return;
 
@@ -60,5 +76,20 @@ public class StaminaController : IUpdate
         }
 
         return false;
+    }
+
+    void ITickable.Register()
+    {
+        throw new NotImplementedException();
+    }
+
+    void ITickable.UnRegister()
+    {
+        throw new NotImplementedException();
+    }
+
+    void ITickable.Tick(float deltaTime)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -28,9 +29,21 @@ namespace ATKVoxelEngine
         // MeshData Buffers
         NativeArray<Vertex> _vertexBufferData;
         NativeArray<uint> _indicesBufferData;
+        VertexAttributeDescriptor[] _descriptors = new VertexAttributeDescriptor[]
+        {
+            new VertexAttributeDescriptor(VertexAttribute.Position, dimension: 3),
+            new VertexAttributeDescriptor(VertexAttribute.Normal, dimension: 3),
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord0, dimension: 2)
+        };
 
         Mesh _mesh;
+        Bounds _bounds;
         bool _isSetup = false;
+        JobHandle _collisionBakeHandle;
+
+        // Tasks
+        Task _collisionTask;
+        Task _meshTask;
 
         public void Initialize(Chunk chunk)
         {
@@ -41,19 +54,17 @@ namespace ATKVoxelEngine
 
             AddVisibleFaces(_chunk);
 
-            int3 chunkWorldPos = new int3(_chunk.WorldPosition.x, _chunk.WorldPosition.y, _chunk.WorldPosition.z);
-            _transformMatrix = GetTransformationMatrix(chunkWorldPos);
-
             SetMeshBuffer();
-
-            _initialized = true;
         }
 
         void SetUp(Chunk chunk)
         {
             _chunkSize = EngineSettings.WorldSettings.ChunkSize;
             _renderParams = new RenderParams(_material);
+            _renderParams.receiveShadows = true;
+            _renderParams.shadowCastingMode = ShadowCastingMode.On;
             _chunk = chunk;
+            _bounds = EngineSettings.WorldSettings.ChunkBounds;
             InitializeDicts(_chunkSize);
         }
 
@@ -75,27 +86,17 @@ namespace ATKVoxelEngine
                         _vertices.Add(new int3(x, y, z), new Vertex[0]);
         }
 
-        // returns a NativeArray with the visible faces voxels within the chunk
-        NativeArray<int> GetVisiblesList(Chunk chunk)
-        {
-            // flatten the 3D array into a 1D array
-            int length = _chunkSize.x * _chunkSize.y * _chunkSize.z;
-            NativeArray<int> result = new NativeArray<int>(length, Allocator.Persistent);
-
-            JobHandle handle = new VisibleVoxelsJob(chunk.GetVoxels(), result, _chunkSize).Schedule();
-            handle.Complete();
-
-            return result;
-        }
-
         // Adds the visible faces to the dictionaries
         void AddVisibleFaces(Chunk chunk)
         {
-            NativeArray<int> visibleFaces = GetVisiblesList(chunk);
+            // Gets the list of visible faces and storing those values in an int array
+            int length = _chunkSize.x * _chunkSize.y * _chunkSize.z;
+            NativeArray<int> visibleFaces = new NativeArray<int>(length, Allocator.Persistent);
+            new VisibleVoxelsJob(chunk.GetVoxels(), visibleFaces, _chunkSize).Schedule().Complete();
 
             for (int i = 0; i < visibleFaces.Length; i++)
             {
-                int3 pos = WorldHelper.GetVoxelPos(i, _chunkSize);
+                int3 pos = EngineUtilities.GetVoxelPos(i, _chunkSize);
                 if (visibleFaces[i] == 0)
                 {
                     _vertices[pos] = new Vertex[0];
@@ -103,7 +104,6 @@ namespace ATKVoxelEngine
                 }
 
                 VoxelData_SO data = EngineSettings.GetVoxelData(chunk.GetVoxel(pos));
-
                 data.MeshData.GetVisiblePlanes(visibleFaces[i], pos, out Vertex[] vertices);
                 _vertices[pos] = vertices;
             }
@@ -112,9 +112,10 @@ namespace ATKVoxelEngine
         }
 
         // Converts the dictionary to NativeArrays
-        void DictToArrays(Dictionary<int3, Vertex[]> verticesDict, ref NativeArray<Vertex> outVertices, ref NativeArray<uint> outIndices)
+        void DictToArrays(Dictionary<int3, Vertex[]> verticesDict, NativeArray<Vertex> outVertices, NativeArray<uint> outIndices)
         {
             int vertexIndex = 0;
+
             foreach (var kvp in verticesDict)
                 foreach (var vertex in kvp.Value)
                     outVertices[vertexIndex++] = vertex;
@@ -135,52 +136,54 @@ namespace ATKVoxelEngine
         // Sets the mesh buffer
         public async void SetMeshBuffer()
         {
-            var descriptors = new VertexAttributeDescriptor[]
-            {
-                new VertexAttributeDescriptor(VertexAttribute.Position, dimension: 3),
-                new VertexAttributeDescriptor(VertexAttribute.Normal, dimension: 3),
-                new VertexAttributeDescriptor(VertexAttribute.TexCoord0, dimension: 2)
-            };
+            await Awaitable.MainThreadAsync();
 
-            int totalVertices = _vertices.Values.Sum(list => list.Length);
-            int totalIndices = totalVertices / MeshPlane.VERTEX_COUNT * MeshPlane.INDEX_COUNT;
+            if (!_isSetup)
+            {
+                _mesh = new Mesh();
+                _mesh.MarkDynamic();
+                _mesh.bounds = _bounds;
+                _isSetup = true;
+            }
+
+            MeshDataArray meshDataArray = AllocateWritableMeshData(1);
+
+            int totalVertices = _vertices.Sum(v => v.Value.Length);
+
+            _meshTask = Task.Factory.StartNew(() => FillMeshBuffer(meshDataArray[0], totalVertices));
+            await _meshTask;
 
             await Awaitable.MainThreadAsync();
 
-            MeshDataArray meshDataArray = AllocateWritableMeshData(1);
-            MeshData meshData = meshDataArray[0];
+            ApplyAndDisposeWritableMeshData(meshDataArray, _mesh, MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontValidateIndices);
 
-            meshData.SetVertexBufferParams(totalVertices, descriptors);
+            int instanceID = _mesh.GetInstanceID();
+            _collisionTask = Task.Factory.StartNew(() => Physics.BakeMesh(instanceID, false));
+            await _collisionTask;
+
+            _collider.sharedMesh = _mesh;
+            _initialized = true;
+        }
+
+        // Fills the mesh buffers with the vertex data stored in the dictionary
+        void FillMeshBuffer(MeshData meshData,int totalVertices)
+        {
+            int totalIndices = totalVertices / MeshPlane.VERTEX_COUNT * MeshPlane.INDEX_COUNT;
+            _transformMatrix = GetTransformationMatrix(_chunk.WorldPosition);
+
+            meshData.SetVertexBufferParams(totalVertices, _descriptors);
             meshData.SetIndexBufferParams(totalIndices, IndexFormat.UInt32);
 
             _vertexBufferData = meshData.GetVertexData<Vertex>();
             _indicesBufferData = meshData.GetIndexData<uint>();
 
-            DictToArrays(_vertices, ref _vertexBufferData, ref _indicesBufferData);
+            DictToArrays(_vertices, _vertexBufferData, _indicesBufferData);
 
             meshData.subMeshCount = 1;
             meshData.SetSubMesh(0, new SubMeshDescriptor(0, totalIndices));
-
-            if (!_isSetup)
-            {
-                _mesh = new Mesh();
-                _mesh.bounds = EngineSettings.WorldSettings.ChunkBounds;
-                _isSetup = true;
-            }
-
-            ApplyAndDisposeWritableMeshData(meshDataArray, _mesh, MeshUpdateFlags.DontRecalculateBounds);
-
-            _collider.sharedMesh = _mesh;
-            _vertexBufferData.Dispose();
-            _indicesBufferData.Dispose();
-            _initialized = true;
         }
 
-        public void RemoveVoxel(int3 vPos)
-        {
-            _vertices[vPos] = new Vertex[0];
-            SetMeshBuffer();
-        }
+        public void RemoveVoxelVertices(int3 vPos) => _vertices[vPos] = new Vertex[0];
 
         public void AddVoxelFace(int3 pos, int3 faceNormal)
         {
@@ -188,7 +191,7 @@ namespace ATKVoxelEngine
             if (id == 0) return;
 
             VoxelData_SO data = EngineSettings.GetVoxelData(id);
-            Vertex[] planes = data.MeshData.GetPlanes(faceNormal);
+            Vertex[] planes = data.MeshData.GetPlanesFromNormal(faceNormal);
 
             for (int i = 0; i < planes.Length; i++)
                 planes[i].position += pos;
@@ -200,7 +203,7 @@ namespace ATKVoxelEngine
             _vertices[pos] = newVertices;
         }
 
-        public void OnRemoveVoxelFace(int3 vPos,int3 normal)
+        public void OnRemoveVoxelFace(int3 vPos, int3 normal)
         {
             _vertices[vPos] = _vertices[vPos].Where(v => !v.normal.Equals(normal)).ToArray();
         }
@@ -214,6 +217,8 @@ namespace ATKVoxelEngine
 
         void OnDisable()
         {
+            _meshTask?.Dispose();
+            _collisionTask?.Dispose();
             _initialized = false;
         }
     }

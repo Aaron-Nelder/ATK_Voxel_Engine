@@ -73,9 +73,9 @@ namespace ATKVoxelEngine
                 int3 pos = new(i % EngineSettings.WorldSettings.ChunkSize.x, (i / EngineSettings.WorldSettings.ChunkSize.x) % EngineSettings.WorldSettings.ChunkSize.y, i / (EngineSettings.WorldSettings.ChunkSize.x * EngineSettings.WorldSettings.ChunkSize.y));
                 VoxelData_SO data = EngineSettings.GetVoxelData(chunk.GetVoxel(pos));
 
-                data.OldMeshData.GetPlanesFromInt(visibleFaces[i], pos, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<int3> normals);
+                //data.OldMeshData.GetPlanesFromInt(visibleFaces[i], pos, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<int3> normals);
 
-                SetData(chunk, pos, vertices, indices, data.ScaledUVs(uvs), normals);
+                //SetData(chunk, pos, vertices, indices, data.ScaledUVs(uvs), normals);
             }
 
             visibleFaces.Dispose();
@@ -177,10 +177,10 @@ namespace ATKVoxelEngine
             if (chunk.GetVoxel(pos) == 0) return;
             VoxelData_SO data = EngineSettings.GetVoxelData(chunk.GetVoxel(pos));
 
-            if (!data.OldMeshData.GetVisiblesPlanes(chunk.Position, pos, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<int3> normals))
-                return;
+            //if (!data.OldMeshData.GetVisiblesPlanes(chunk.Position, pos, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<int3> normals))
+                //return;
 
-            SetData(chunk, pos, vertices, indices, data.ScaledUVs(uvs), normals);
+            //SetData(chunk, pos, vertices, indices, data.ScaledUVs(uvs), normals);
         }
 
         public void AddVoxelFace(Chunk chunk, int3 pos, int3 faceNormal)
@@ -188,9 +188,9 @@ namespace ATKVoxelEngine
             uint id = chunk.GetVoxel(pos);
             if (id == 0) return;
             VoxelData_SO data = EngineSettings.GetVoxelData(id);
-            data.OldMeshData.GetPlane(pos, faceNormal, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<int3> normals);
+            //data.OldMeshData.GetPlane(pos, faceNormal, out List<Vector3> vertices, out List<int> indices, out List<Vector2> uvs, out List<int3> normals);
 
-            AddData(chunk, pos, vertices, indices, data.ScaledUVs(uvs), normals);
+            //AddData(chunk, pos, vertices, indices, data.ScaledUVs(uvs), normals);
         }
 
         // Removes the given block from the mesh data

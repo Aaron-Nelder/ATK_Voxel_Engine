@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ATKVoxelEngine
 {
-    [CreateAssetMenu(fileName = "MotionStats", menuName = EngineConstants.ENGINE_NAME + "/Motion/MotionStats")]
+    [CreateAssetMenu(fileName = "Motion Stats", menuName = EngineConstants.ENGINE_NAME + "/Motion/Motion Stats")]
     public class MotionStats_SO : ScriptableObject
     {
         [SerializeField] float _mass = 62;
@@ -23,7 +23,7 @@ namespace ATKVoxelEngine
         [SerializeField] float _moveSpeedMul = 1;
         public float MoveSpeedMul => _moveSpeedMul;
 
-        [SerializeField] float _gravity = 9.81f;
-        public float Gravity => _gravity;
+        [SerializeField] Vector3 _size = new(1.0f,2.0f,1.0f);
+        public Vector3 Size => _size;
     }
 }

@@ -17,12 +17,12 @@ MonoBehaviour:
     AOMethod: 1
     Downsample: 1
     AfterOpaque: 0
-    Source: 0
+    Source: 1
     NormalSamples: 0
     Intensity: 0.5
     DirectLightingStrength: 0.25
     Radius: 0.25
-    Samples: 2
+    Samples: 1
     BlurQuality: 0
     Falloff: 100
     SampleCount: -1
@@ -88,4 +88,4 @@ MonoBehaviour:
   m_DepthAttachmentFormat: 0
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
-  m_IntermediateTextureMode: 1
+  m_IntermediateTextureMode: 0

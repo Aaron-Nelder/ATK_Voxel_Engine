@@ -20,7 +20,7 @@ public class HeldVoxel: MonoBehaviour
 
     void AssignMesh(VoxelData_SO data)
     {
-        _filter.mesh = data.MeshData.Mesh;
-        _renderer.material = data.MeshData.material;
+        _filter.mesh = data.MeshData.MeshInstance;
+        _renderer.material = data.MeshData.Material;
     }
 }

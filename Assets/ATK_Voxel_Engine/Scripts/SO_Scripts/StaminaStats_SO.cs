@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ATKVoxelEngine
 {
-    [CreateAssetMenu(fileName = "StaminaStats", menuName = EngineConstants.ENGINE_NAME + "/Motion/Stamina Stats")]
+    [CreateAssetMenu(fileName = "Stamina Stats", menuName = EngineConstants.ENGINE_NAME + "/Motion/Stamina Stats")]
     public class StaminaStats_SO : ScriptableObject
     {
         [SerializeField] uint _max = 100;

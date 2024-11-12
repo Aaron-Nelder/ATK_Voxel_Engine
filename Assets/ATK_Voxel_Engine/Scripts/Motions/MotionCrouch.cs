@@ -1,43 +1,46 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class MotionCrouch : BaseMotion
+namespace ATKVoxelEngine
 {
-    public override bool IsEnabled { get; protected set; } = false;
-    public override MotionType Type { get; protected set; } = MotionType.Crouching;
-    public override EntityMotionHandler Handler { get; protected set; }
-
-    [SerializeField] float _cHeight = 0.5f;
-    [SerializeField] float _speed = 0.5f;
-    [SerializeField] float _standMove = 5f;
-
-    bool _isCrouching = false;
-
-    void OnCrouch(InputValue value) => _isCrouching = value.isPressed;
-
-    public override void ProccessUpdate()
+    public class MotionCrouch : BaseMotion
     {
-        if (_isCrouching && Handler.Controller.height != _cHeight)
+        public override bool IsEnabled { get; protected set; } = false;
+        public override MotionType Type => MotionType.CROUCH;
+        public override TickType TickType => TickType.FIXED_UPDATE;
+        public override EntityMotionHandler Handler { get; protected set; }
+
+        [SerializeField] float _cHeight = 0.5f;
+        [SerializeField] float _speed = 0.5f;
+
+        bool _isCrouching = false;
+
+        void OnCrouch(InputValue value) => _isCrouching = value.isPressed;
+
+        public override void Tick(float deltaTime)
         {
-            Handler.Controller.height = Mathf.Lerp(Handler.Controller.height, _cHeight, _speed * Time.deltaTime);
-        }
-        else if (!_isCrouching && Handler.Controller.height != Handler.EntityStats.Height)
-        {
-            if (CanStand())
+            if (!_isCrouching && Handler.Collider.size.y == Handler.EntityStats.MotionStats.Size.y)
+                return;
+
+            Handler.Rigidbody.WakeUp();
+
+            if (_isCrouching && Handler.Collider.bounds.size.y != _cHeight)
             {
-                float newHeight = Mathf.Lerp(Handler.Controller.height, Handler.EntityStats.Height, _speed * Time.deltaTime);
-                Handler.Move(Vector3.up * (newHeight - Handler.Controller.height) * _standMove);
-                Handler.Controller.height = newHeight;
+                Vector3 target = new(Handler.Collider.size.x, _cHeight, Handler.Collider.size.z);
+                Handler.Collider.size = Vector3.Lerp(Handler.Collider.size, target, _speed * deltaTime);
+                if (Vector3.Distance(Handler.Collider.size, target) <= 0.05)
+                    Handler.Collider.size = target;
+            }
+            else if (!_isCrouching && Handler.Collider.size.y != Handler.EntityStats.MotionStats.Size.y)
+            {
+                if (!Handler.HitHead)
+                {
+                    Vector3 target = new(Handler.Collider.size.x, Handler.EntityStats.MotionStats.Size.y, Handler.Collider.size.z);
+                    Handler.Collider.size = Vector3.Lerp(Handler.Collider.size, target, _speed * deltaTime);
+                    if (Vector3.Distance(Handler.Collider.size, target) <= 0.05)
+                        Handler.Collider.size = target;
+                }
             }
         }
-    }
-
-    bool CanStand()
-    {
-        Vector3 origin = Handler.transform.position + Vector3.up * Handler.EntityStats.Height;
-        Vector3 direction = Vector3.up * (_cHeight - Handler.EntityStats.Height);
-
-        return !Physics.Raycast(origin, direction, direction.magnitude, Handler.Stats.GroundedLayers, QueryTriggerInteraction.Ignore);
     }
 }

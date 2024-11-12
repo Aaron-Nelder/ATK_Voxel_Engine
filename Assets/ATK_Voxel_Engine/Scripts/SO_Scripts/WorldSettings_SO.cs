@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 namespace ATKVoxelEngine
 {
-    [CreateAssetMenu(fileName = "World_Settings", menuName = EngineConstants.ENGINE_NAME + "/World_Settings", order = 1)]
+    [CreateAssetMenu(fileName = "World_Settings", menuName = EngineConstants.ENGINE_NAME + "/World Settings", order = 1)]
     public class WorldSettings_SO : ScriptableObject
     {
         [SerializeField] GameObject _chunkPrefab;
@@ -21,9 +21,12 @@ namespace ATKVoxelEngine
         [SerializeField] int _seed = 0;
         public int Seed => _seed;
 
-        [SerializeField] short _chunkTickRate = 1000;
-        public short ChunkTickRate => _chunkTickRate;
+        [SerializeField] float2 _humidityRange = new float2(0, 1);
+        public float2 HumidityRange => _humidityRange;
 
+        [SerializeField] float2 _temperatureRange = new float2(-45.0f, 45.0f);
+        public float2 TemperatureRange => _temperatureRange;
+        
         [SerializeField] NoiseProfile_SO _heightNoise;
         public NoiseProfile_SO HeightNoise => _heightNoise;
 

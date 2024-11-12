@@ -31,6 +31,7 @@ namespace ATKVoxelEngine
         public DebugStyle playerChunkBorder;
 
         public GameObject debugLinePrefab;
+        public Material wireframeMaterial;
     }
 
     [System.Serializable]

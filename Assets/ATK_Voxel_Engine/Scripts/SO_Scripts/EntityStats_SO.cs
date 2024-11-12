@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ATKVoxelEngine
 {
-    [CreateAssetMenu(fileName = "PlayerStats", menuName = EngineConstants.ENGINE_NAME + "/Player_Stats", order = 1)]
+    [CreateAssetMenu(fileName = "Entity Stats", menuName = EngineConstants.ENGINE_NAME + "/Entity Stats", order = 1)]
     public class EntityStats_SO : ScriptableObject
     {
         [SerializeField] private StaminaStats_SO _staminaStats;
@@ -16,8 +16,5 @@ namespace ATKVoxelEngine
 
         [SerializeField] float _placeSpeed = 1.0f;
         public float PlaceSpeed => _placeSpeed;
-
-        [SerializeField] float _height = 2.0f;
-        public float Height => _height;
     }
 }

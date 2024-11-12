@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -11,8 +12,9 @@ namespace ATKVoxelEngine
 
         public static ConcurrentDictionary<ChunkPosition, Chunk> Chunks { get; private set; } = new ConcurrentDictionary<ChunkPosition, Chunk>();
 
-        public static Action<ChunkPosition> OnChunkLoaded;
         public static Action<ChunkPosition, ChunkPosition> OnPlayerChunkUpdate;
+
+        static ChunkPosition _lastKnownPlayerChunk = new ChunkPosition(0, 0);
 
         public static void SpawnStartingChunks(Transform parent)
         {
@@ -21,82 +23,67 @@ namespace ATKVoxelEngine
 
             GenerateChunksAtOrigin();
 
-            OnPlayerChunkUpdate += OnPlayerChunkChange;
+            TickRateManager.OnChunkLoadTick += OnChunkLoadTick;
+            Application.quitting += () => TickRateManager.OnChunkLoadTick -= OnChunkLoadTick;
         }
 
+        // Checks to see if the player hass entered a new chunk
+        static void OnChunkLoadTick(float deltaTime)
+        {
+            ChunkPosition currentChunk = PlayerHelper.PlayerChunk;
+
+            if (_lastKnownPlayerChunk == currentChunk) return;
+
+            ChunkPosition dir = currentChunk - _lastKnownPlayerChunk;
+            _lastKnownPlayerChunk = currentChunk;
+
+            RefreshRenderDistance(currentChunk);
+            //UnloadRenderDistance(currentChunk, dir);
+            //LoadRenderDistance(currentChunk, dir);
+        }
+
+        static void RefreshRenderDistance(ChunkPosition chunkPos)
+        {
+            ushort halfRendDis = (ushort)(EngineSettings.WorldSettings.RenderDistance / 2);
+
+            // unload all chunks that aren't within the render distance
+            foreach (var chunk in Chunks)
+                if (math.abs(chunk.Key.x - chunkPos.x) > halfRendDis || math.abs(chunk.Key.z - chunkPos.z) > halfRendDis)
+                    chunk.Value.Dispose();
+
+            // load all chunks that are within the render distance
+            for (int x = -halfRendDis; x < halfRendDis + 1; x++)
+                for (int z = -halfRendDis; z < halfRendDis + 1; z++)
+                    if (!Chunks.ContainsKey(new(chunkPos.x + x, chunkPos.z + z)))
+                        ChunkLoadManager.QueueChunkForLoad(new(chunkPos.x + x, chunkPos.z + z));
+        }
+
+        // Generates the starting chunks for the game
         static void GenerateChunksAtOrigin()
         {
             int interval = EngineSettings.WorldSettings.RenderDistance / 2;
             for (int x = -interval; x < interval + 1; x += 1)
                 for (int z = -interval; z < interval + 1; z += 1)
-                    GenerateChunk(new(x, z), true);
+                    ChunkLoadManager.QueueChunkForLoad(new(x, z), true);
         }
 
-        static void GenerateChunk(ChunkPosition pos, bool useThreads = true)
+        // Get's a chunk prefab from the pool and starts loading it
+        public static void GenerateChunk(ChunkPosition pos, bool useThreads = true)
         {
             if (Chunks.ContainsKey(pos)) return;
-            GameObject chunkObj = GameManager.Instance.Pool.ChunkOBJPool.Get();
-            int3 chunkPos = WorldHelper.ChunkPosToWorldPos(pos);
-            chunkObj.transform.position = new Vector3(chunkPos.x, chunkPos.y, chunkPos.z);
+
+            GameObject chunkObj = EngineManager.Instance.Pool.ChunkOBJPool.Get();
+            chunkObj.transform.position = EngineUtilities.ChunkPosToWorldPosVec3(pos);
             chunkObj.transform.SetParent(chunkParent);
             chunkObj.name = $"Chunk: ({pos.x},{pos.z})";
             chunkObj.GetComponent<Chunk>().Startup(pos, useThreads);
         }
 
-        public static void OnPlayerChunkChange(ChunkPosition playerChunk, ChunkPosition dir)
-        {
-            LoadRenderDistance(playerChunk, dir);
-            UnloadRenderDistance(playerChunk, dir);
-        }
-
-        static void LoadRenderDistance(ChunkPosition playerChunk, ChunkPosition dir)
-        {
-            int halfRenderDistance = EngineSettings.WorldSettings.RenderDistance / 2;
-
-            ChunkPosition newDir = dir * halfRenderDistance;
-
-            for (int row = -halfRenderDistance; row < halfRenderDistance + 1; row++)
-            {
-                if (newDir.x == 0)
-                {
-                    int z = newDir.z > 0 ? newDir.z - 1 : newDir.z + 1;
-                    GenerateChunk(new(playerChunk.x + row, playerChunk.z + newDir.z));
-                }
-                else
-                {
-                    int x = newDir.x > 0 ? newDir.x - 1 : newDir.x + 1;
-                    GenerateChunk(new(playerChunk.x + newDir.x, playerChunk.z + row));
-                }
-            }
-        }
-
-        // Unload chunks that are not in the render distance
-        static void UnloadRenderDistance(ChunkPosition playerChunk, ChunkPosition dir)
-        {
-            int halfRenderDistance = EngineSettings.WorldSettings.RenderDistance / 2;
-
-            dir = -dir * halfRenderDistance;
-
-            ChunkPosition startDir = new(dir.x, dir.z);
-
-            if (dir.x != 0)
-                dir.x += dir.x > 0 ? 1 : -1;
-            else if (dir.z != 0)
-                dir.z += dir.z > 0 ? 1 : -1;
-
-            // Disposes of the chunk row
-            for (int row = -halfRenderDistance; row < halfRenderDistance + 1; row++)
-                if (dir.x == 0)
-                    Chunks[new(playerChunk.x + row, playerChunk.z + dir.z)].Dispose();
-                else
-                    Chunks[new(playerChunk.x + dir.x, playerChunk.z + row)].Dispose();
-        }
-
         // Disposes of all chunks
-        public static void Dispose(bool isEditor = false)
+        public static void Dispose()
         {
             foreach (var chunk in Chunks)
-                chunk.Value.Dispose(isEditor);
+                chunk.Value.Dispose();
             Chunks.Clear();
         }
 
