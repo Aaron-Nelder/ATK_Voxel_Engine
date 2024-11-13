@@ -233,23 +233,48 @@ namespace ATKVoxelEngine.EditorManager
             if (PlayerManager.Instance == null)
                 PlayerManager.Instance = GameObject.FindFirstObjectByType<PlayerManager>();
 
-            Rect rect = new(10, -90, 200, 200);
-            if (DebugSettings.editorShowFPS) EditorGUI.LabelField(rect, $"FPS: {DebugHelper.FPS}", _defaultLabel);
-            rect.y += 20;
-            if (DebugSettings.editorShowActiveChunks) EditorGUI.LabelField(rect, $"ActiveChunks: {ChunkManager.Chunks.Count}", _defaultLabel);
-            rect.y += 20;
-            if (DebugSettings.editorShowPlayerChunk) EditorGUI.LabelField(rect, $"PlayerChunk: {PlayerHelper.PlayerChunk.x}, {PlayerHelper.PlayerChunk.z}", _defaultLabel);
-            rect.y += 20;
-            if (DebugSettings.editorShowPlayerPos) EditorGUI.LabelField(rect, $"PlayerPos: {PlayerHelper.PlayerVoxelPosition.x},{PlayerHelper.PlayerVoxelPosition.y}, {PlayerHelper.PlayerVoxelPosition.z}", _defaultLabel);
-            rect.y += 20;
-            if (DebugSettings.editorShowCameraChunk) EditorGUI.LabelField(rect, $"CameraChunk: {DebugHelper.CameraChunk.x}, {DebugHelper.CameraChunk.z}", _defaultLabel);
-            rect.y += 20;
-            if (DebugSettings.editorShowCameraPos) EditorGUI.LabelField(rect, $"CameraPos: {DebugHelper.CameraPos.x},{DebugHelper.CameraPos.y}, {DebugHelper.CameraPos.z}", _defaultLabel);
-            rect.y += 20;
-            if (DebugSettings.editorShowCPUTime) EditorGUI.LabelField(rect, $"CPUTime: {DebugHelper.CPUTime} ms", _defaultLabel);
-            rect.y += 20;
-            if (DebugSettings.editorShowGPUTime) EditorGUI.LabelField(rect, $"GPUTime: {DebugHelper.GPUTime} ms", _defaultLabel);
-            rect.y += 20;
+            Rect rect = new(10, -50, 200, 200);
+            if (DebugSettings.editorShowFPS)
+            {
+                EditorGUI.LabelField(rect, $"FPS: {DebugHelper.FPS}", _defaultLabel);
+                rect.y += 20;
+            }
+
+            if (DebugSettings.editorShowActiveChunks)
+            {
+                EditorGUI.LabelField(rect, $"ActiveChunks: {ChunkManager.Chunks.Count}", _defaultLabel);
+                rect.y += 20;
+            }
+            if (DebugSettings.editorShowPlayerChunk)
+            {
+                EditorGUI.LabelField(rect, $"PlayerChunk: {PlayerHelper.PlayerChunk.x}, {PlayerHelper.PlayerChunk.z}", _defaultLabel);
+                rect.y += 20;
+            }
+            if (DebugSettings.editorShowPlayerPos)
+            {
+                EditorGUI.LabelField(rect, $"PlayerPos: {PlayerHelper.PlayerVoxelPosition.x},{PlayerHelper.PlayerVoxelPosition.y}, {PlayerHelper.PlayerVoxelPosition.z}", _defaultLabel);
+                rect.y += 20;
+            }
+            if (DebugSettings.editorShowCameraChunk)
+            {
+                EditorGUI.LabelField(rect, $"CameraChunk: {DebugHelper.CameraChunk.x}, {DebugHelper.CameraChunk.z}", _defaultLabel);
+                rect.y += 20;
+            }
+            if (DebugSettings.editorShowCameraPos)
+            {
+                EditorGUI.LabelField(rect, $"CameraPos: {DebugHelper.CameraPos.x},{DebugHelper.CameraPos.y}, {DebugHelper.CameraPos.z}", _defaultLabel);
+                rect.y += 20;
+            }
+            if (DebugSettings.editorShowCPUTime)
+            {
+                EditorGUI.LabelField(rect, $"CPUTime: {DebugHelper.CPUTime} ms", _defaultLabel);
+                rect.y += 20;
+            }
+            if (DebugSettings.editorShowGPUTime)
+            {
+                EditorGUI.LabelField(rect, $"GPUTime: {DebugHelper.GPUTime} ms", _defaultLabel);
+                rect.y += 20;
+            }
             if (DebugSettings.editorShowBatches) EditorGUI.LabelField(rect, $"Batches: {DebugHelper.Batches}", _defaultLabel);
         }
         static void MeshEditorGUI()

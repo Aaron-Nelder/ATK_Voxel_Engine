@@ -242,18 +242,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
---- !u!114 &507392111 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8349150902902488850, guid: 86405e41b1fcf7f40af5eb4854706bc0,
-    type: 3}
-  m_PrefabInstance: {fileID: 3286560536402317279}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 942b170136470754e97608d58f9204e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &601725468
 GameObject:
   m_ObjectHideFlags: 0
@@ -719,24 +707,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6364802238667201095, guid: 86405e41b1fcf7f40af5eb4854706bc0,
         type: 3}
-      propertyPath: <HUD>k__BackingField
-      value: 
-      objectReference: {fileID: 507392111}
-    - target: {fileID: 6364802238667201095, guid: 86405e41b1fcf7f40af5eb4854706bc0,
-        type: 3}
       propertyPath: <PlayerCamera>k__BackingField
       value: 
       objectReference: {fileID: 1598861220}
-    - target: {fileID: 6467108205631291608, guid: 86405e41b1fcf7f40af5eb4854706bc0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6566567357958581726, guid: 86405e41b1fcf7f40af5eb4854706bc0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8707062369284353875, guid: 86405e41b1fcf7f40af5eb4854706bc0,
         type: 3}
       propertyPath: m_Name
@@ -810,13 +783,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: Engine Manager
       objectReference: {fileID: 0}
-    - target: {fileID: 8853718352198367447, guid: 40b09f041f955dc489e34d88f1044855,
-        type: 3}
-      propertyPath: m_TagString
-      value: EngineManager
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 0}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

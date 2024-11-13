@@ -24,8 +24,8 @@ namespace ATKVoxelEngine
         [SerializeField] float _persistance = 0.5f;
         public float Persistance => _persistance;
 
-        [SerializeField] int _magClamp = 1;
-        public int MagClamp => _magClamp;
+        [SerializeField] uint _magClamp = 1;
+        public uint MagClamp => _magClamp;
 
         [SerializeField] bool _useThreshold = false;
         public bool UseThreshold => _useThreshold;

@@ -22,9 +22,10 @@
     justify-content: flex-start;
     align-items: stretch;
     align-content: flex-start;
-    font-size: 14px;
-    -unity-font-style: bold-and-italic;
+    font-size: 20px;
+    -unity-font-style: normal;
     -unity-text-align: middle-left;
     white-space: normal;
     text-overflow: ellipsis;
+    -unity-font-definition: url("project://database/Assets/ATK_Voxel_Engine/Fonts/PerfectDOSVGA437.ttf?fileID=12800000&guid=bf3877327f1efc64cbec8f1c14e20eb3&type=3#PerfectDOSVGA437");
 }

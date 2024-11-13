@@ -47,6 +47,9 @@ namespace ATKVoxelEngine
 
         public void Initialize(Chunk chunk)
         {
+#if UNITY_EDITOR
+            runInEditMode = true;
+#endif
             _initialized = false;
 
             if (!_isSetup)

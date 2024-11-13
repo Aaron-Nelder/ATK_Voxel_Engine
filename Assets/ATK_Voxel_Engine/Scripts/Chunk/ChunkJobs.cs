@@ -10,7 +10,7 @@ namespace ATKVoxelEngine
     {
         int2 _noiseSize, _offset;
         float _amplitude, _frequency;
-        int _seed, _magClamp;
+        uint _seed, _magClamp;
         float2 _scale;
         ushort _octaves;
 
@@ -35,7 +35,7 @@ namespace ATKVoxelEngine
 
         public void Execute()
         {
-            Random random = new Random((uint)_seed);
+            Random random = new Random(_seed);
 
             // create a max possible value for noise
             float maxPossibleNoiseValue = 0;
@@ -89,7 +89,7 @@ namespace ATKVoxelEngine
     {
         int3 _noiseSize;
         float3 _scale;
-        int _seed;
+        uint _seed;
         ushort _octaves;
         float _amplitude;
         float _frequency;
@@ -116,7 +116,7 @@ namespace ATKVoxelEngine
 
         public void Execute()
         {
-            Random random = new Random((uint)_seed);
+            Random random = new Random(_seed);
 
             // create a max possible value for noise
             float maxPossibleNoiseValue = 0;
@@ -174,11 +174,11 @@ namespace ATKVoxelEngine
     {
         NativeArray<uint> _voxels;
         readonly int3 _chunkSize;
-        int _seed;
+        uint _seed;
         int3 _offset;
 
         float _hNoiseAmplitude, _hNoiseFrequency;
-        int _hNoiseMagClamp;
+        uint _hNoiseMagClamp;
         float2 _hNoiseScale;
         ushort _hNoiseOctaves;
         NativeArray<int> _hNoiseMap;
@@ -217,7 +217,7 @@ namespace ATKVoxelEngine
 
         public void Execute()
         {
-            Random random = new Random((uint)_seed);
+            Random random = new Random(_seed);
             GenerateHeightNoise(ref random);
             GenerateCaveNoise(ref random);
             AssignVoxels();

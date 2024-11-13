@@ -42,9 +42,20 @@ namespace ATKVoxelEngine
 
             ObjectField heightNoiseSO = _inspector.Q<ObjectField>("HeightNoise");
             ObjectField chunkNoiseSO = _inspector.Q<ObjectField>("CaveNoise");
-            PropertyField chunkSize = _inspector.Q<PropertyField>("ChunkSize");
 
-            chunkSize.RegisterValueChangeCallback(evt =>
+            _inspector.Q<UnsignedIntegerField>("XField").RegisterValueChangedCallback(evt =>
+            {
+                Vector3 newVal = new Vector3(settings.ChunkSize.x, settings.ChunkSize.y, settings.ChunkSize.z);
+                _inspector.Q<BoundsField>("ChunkBounds").value = new Bounds(newVal / 2, newVal);
+            });
+
+            _inspector.Q<UnsignedIntegerField>("YField").RegisterValueChangedCallback(evt =>
+            {
+                Vector3 newVal = new Vector3(settings.ChunkSize.x, settings.ChunkSize.y, settings.ChunkSize.z);
+                _inspector.Q<BoundsField>("ChunkBounds").value = new Bounds(newVal / 2, newVal);
+            });
+
+            _inspector.Q<UnsignedIntegerField>("ZField").RegisterValueChangedCallback(evt =>
             {
                 Vector3 newVal = new Vector3(settings.ChunkSize.x, settings.ChunkSize.y, settings.ChunkSize.z);
                 _inspector.Q<BoundsField>("ChunkBounds").value = new Bounds(newVal / 2, newVal);

@@ -17,6 +17,7 @@ namespace ATKVoxelEngine
                 return _worldSettings;
             }
         }
+
         static DebugSettings_SO _debugSettings;
         public static DebugSettings_SO DebugSettings
         {
@@ -27,6 +28,7 @@ namespace ATKVoxelEngine
                 return _debugSettings;
             }
         }
+
         static TickRates_SO _tickRateSettings;
         public static TickRates_SO TickRateSettings
         {

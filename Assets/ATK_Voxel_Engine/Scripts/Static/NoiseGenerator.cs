@@ -10,7 +10,7 @@ namespace ATKVoxelEngine
             int[,] noiseMap = new int[wSettings.ChunkSize.x, wSettings.ChunkSize.z];
 
             // create a random number generator with the seed
-            System.Random prng = new System.Random(wSettings.Seed);
+            System.Random prng = new System.Random((int)wSettings.Seed);
 
             // create an array of octaves
             Vector2[] octavesOffset = new Vector2[pro.Octaves];
@@ -70,7 +70,7 @@ namespace ATKVoxelEngine
             int[,,] noiseMap = new int[wSettings.ChunkSize.x, wSettings.ChunkSize.y, wSettings.ChunkSize.z];
 
             // create a random number generator with the seed
-            System.Random prng = new System.Random(wSettings.Seed);
+            System.Random prng = new System.Random((int)wSettings.Seed);
 
             // create an array of octaves
             Vector3[] octavesOffset = new Vector3[pro.Octaves];

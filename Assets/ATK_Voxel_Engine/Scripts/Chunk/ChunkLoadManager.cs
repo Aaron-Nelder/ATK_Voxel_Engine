@@ -22,6 +22,7 @@ namespace ATKVoxelEngine
         // Gets called when a chunk has finished loading
         public static void OnChunkLoaded(ChunkPosition pos)
         {
+            if (_chunksLoading.Count <= 0) return;
             _chunksLoading.Pop();
             CheckForChunkLoad();
         }

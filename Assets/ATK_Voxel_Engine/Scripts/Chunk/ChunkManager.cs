@@ -72,7 +72,13 @@ namespace ATKVoxelEngine
         {
             if (Chunks.ContainsKey(pos)) return;
 
-            GameObject chunkObj = EngineManager.Instance.Pool.ChunkOBJPool.Get();
+            GameObject chunkObj;
+
+            if (useThreads)
+                chunkObj = EngineManager.Instance.Pool.ChunkOBJPool.Get();
+            else
+                chunkObj = GameObject.Instantiate(EngineSettings.WorldSettings.ChunkPrefab);
+
             chunkObj.transform.position = EngineUtilities.ChunkPosToWorldPosVec3(pos);
             chunkObj.transform.SetParent(chunkParent);
             chunkObj.name = $"Chunk: ({pos.x},{pos.z})";

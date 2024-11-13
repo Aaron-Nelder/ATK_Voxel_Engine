@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 971666930541302982}
   m_Layer: 0
   m_Name: Engine Manager
-  m_TagString: VoxelManager
+  m_TagString: EngineManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

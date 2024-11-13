@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using Unity.Mathematics;
 
 namespace ATKVoxelEngine
 {
@@ -32,13 +33,13 @@ namespace ATKVoxelEngine
         public Folliage[] folliages => _folliage;
 
         #region Spawn Parameters
-        [SerializeField] Vector2 _elevation;
+        [SerializeField] float2 _elevation;
         public Vector2 Elevation => _elevation;
 
-        [SerializeField] Vector2 _temperature;
+        [SerializeField] float2 _temperature;
         public Vector2 Temperature => _temperature;
 
-        [SerializeField] Vector2 _humidity;
+        [SerializeField] float2 _humidity;
         public Vector2 Humidity => _humidity;
         #endregion
 

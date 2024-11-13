@@ -18,8 +18,8 @@ namespace ATKVoxelEngine
         [SerializeField] ushort _renderDistance = 4;
         public ushort RenderDistance => _renderDistance;
 
-        [SerializeField] int _seed = 0;
-        public int Seed => _seed;
+        [SerializeField] uint _seed = 0;
+        public uint Seed => _seed;
 
         [SerializeField] float2 _humidityRange = new float2(0, 1);
         public float2 HumidityRange => _humidityRange;

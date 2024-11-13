@@ -20,8 +20,14 @@ MonoBehaviour:
   _folliage:
   - type: 1
     density: 2
-  _elevation: {x: 0, y: 128}
-  _temperature: {x: 0, y: 24}
-  _humidity: {x: 0.5, y: 1}
+  _elevation:
+    x: 0
+    y: 128
+  _temperature:
+    x: 0
+    y: 45
+  _humidity:
+    x: 1
+    y: 1
   _heightNoise: {fileID: 11400000, guid: 6b4c691775c30064380481bd3eda6b7a, type: 2}
   _caveNoise: {fileID: 11400000, guid: 43269a41c8cd5564483ab47c634ad0c7, type: 2}

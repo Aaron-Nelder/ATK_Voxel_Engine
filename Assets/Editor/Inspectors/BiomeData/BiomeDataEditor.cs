@@ -14,7 +14,6 @@ namespace ATKVoxelEngine
 
         VisualElement _heightVE;
         VisualElement _caveVE;
-        Vector2Field _elevationField;
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -27,20 +26,60 @@ namespace ATKVoxelEngine
             Label headerLabel = _inspector.Q<Label>("Header");
             headerLabel.text = _target.name;
 
-            _elevationField = _inspector.Q<Vector2Field>("Elevation");
-
-            // Ensures the elevation field is within the bounds of the chunk size.
-            _elevationField.RegisterValueChangedCallback((evt) =>
-            {
-                float x = Mathf.Clamp(evt.newValue.x, 0, EngineSettings.WorldSettings.ChunkSize.y);
-                float y = Mathf.Clamp(evt.newValue.y, 0, EngineSettings.WorldSettings.ChunkSize.y);
-                _elevationField.value = new Vector2(x, y);
-            });
+            Clamps();
 
             NoiseFields();
 
             // Return the finished Inspector UI.
             return _inspector;
+        }
+
+        void Clamps()
+        {
+            FloatField elevationMin = _inspector.Q<FloatField>("elevationMin");
+            FloatField elevationMax = _inspector.Q<FloatField>("elevationMax");
+
+            elevationMin.RegisterValueChangedCallback((evt) =>
+            {
+                //elevationMin.value = Mathf.Clamp(evt.newValue, 0, elevationMax.value);
+                //elevationMax.value = Mathf.Clamp(elevationMax.value, elevationMin.value, EngineSettings.WorldSettings.ChunkSize.y);
+            });
+
+            _inspector.Q<FloatField>("elevationMax").RegisterValueChangedCallback((evt) =>
+            {
+                //elevationMin.value = Mathf.Clamp(elevationMin.value, 0, evt.newValue);
+                //elevationMax.value = Mathf.Clamp(evt.newValue, elevationMin.value, EngineSettings.WorldSettings.ChunkSize.y);
+            });
+
+            FloatField temperatureMin = _inspector.Q<FloatField>("temperatureMin");
+            FloatField temperatureMax = _inspector.Q<FloatField>("temperatureMax");
+
+            temperatureMin.RegisterValueChangedCallback((evt) =>
+            {
+                //temperatureMin.value = Mathf.Clamp(evt.newValue, EngineSettings.WorldSettings.TemperatureRange.x, temperatureMax.value);
+                //temperatureMax.value = Mathf.Clamp(temperatureMax.value, temperatureMin.value, EngineSettings.WorldSettings.TemperatureRange.y);
+            });
+
+            temperatureMax.RegisterValueChangedCallback((evt) =>
+            {
+                //temperatureMin.value = Mathf.Clamp(temperatureMin.value, EngineSettings.WorldSettings.TemperatureRange.x, evt.newValue);
+                //temperatureMax.value = Mathf.Clamp(evt.newValue, temperatureMin.value, EngineSettings.WorldSettings.TemperatureRange.y);
+            });
+
+            float humidityMin = _inspector.Q<FloatField>("humidityMin").value;
+            float humidityMax = _inspector.Q<FloatField>("humidityMax").value;
+
+            _inspector.Q<FloatField>("humidityMin").RegisterValueChangedCallback((evt) =>
+            {
+                //_inspector.Q<FloatField>("humidityMin").value = Mathf.Clamp(evt.newValue, EngineSettings.WorldSettings.HumidityRange.x, humidityMax);
+                //_inspector.Q<FloatField>("humidityMax").value = Mathf.Clamp(humidityMax, evt.newValue, EngineSettings.WorldSettings.HumidityRange.y);
+            });
+
+            _inspector.Q<FloatField>("humidityMax").RegisterValueChangedCallback((evt) =>
+            {
+                //_inspector.Q<FloatField>("humidityMin").value = Mathf.Clamp(humidityMin, EngineSettings.WorldSettings.HumidityRange.x, evt.newValue);
+                //_inspector.Q<FloatField>("humidityMax").value = Mathf.Clamp(evt.newValue, humidityMin, EngineSettings.WorldSettings.HumidityRange.y);
+            });
         }
 
         void NoiseFields()

@@ -33,8 +33,7 @@ namespace ATKVoxelEngine
 
                 // toggle the threshold slider on and off based on the toggle
                 Toggle useThreshold = _inspector.Q<Toggle>("UseThreshold");
-                PropertyField threshold = _inspector.Q<PropertyField>("Threshold");
-                threshold.label = "";
+                GroupBox threshold = _inspector.Q<GroupBox>("Threshold");
 
                 useThreshold.RegisterValueChangedCallback((evt) =>
                 {
