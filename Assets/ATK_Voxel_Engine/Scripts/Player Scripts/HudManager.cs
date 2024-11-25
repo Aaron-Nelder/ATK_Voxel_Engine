@@ -6,7 +6,7 @@ namespace ATKVoxelEngine
     public class HudManager : MonoBehaviour
     {
         [SerializeField] UIDocument _hudDocument;
-        [SerializeField] DebugHud _debugHUD;
+        DebugHud _debugHUD;
 
         VisualElement _debugElements;
         VisualElement _staminaBar;
@@ -22,14 +22,15 @@ namespace ATKVoxelEngine
             _initialized = true;
 
             DebugHelper.OnDebugging += EnableDebugging;
-            PlayerManager.Instance.MotionHandler.StamController.OnStaminaChanged += OnStaminaChanged;        
+            PlayerManager.Instance.MotionHandler.StamController.OnStaminaChanged += OnStaminaChanged;
         }
 
         void AssignElements()
         {
             _debugElements = _hudDocument.rootVisualElement.Q<VisualElement>("Debug");
             _staminaBar = _hudDocument.rootVisualElement.Q<VisualElement>("Stamina");
-            _debugHUD.Init(_hudDocument);
+            if (_debugHUD == null)
+                _debugHUD = new DebugHud(_hudDocument);
         }
 
         void OnEnable()
@@ -51,9 +52,11 @@ namespace ATKVoxelEngine
         {
             if (_debugHUD == null) return;
 
-            if (!_debugHUD.Initialized)
+            if (enabled && !_debugHUD.Registered)
+                _debugHUD.Register();
+            else if (_debugHUD.Registered)
+                _debugHUD.UnRegister();
 
-                _debugHUD.enabled = enabled;
             _debugElements.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
         }
 

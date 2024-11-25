@@ -26,11 +26,11 @@ namespace ATKVoxelEngine
 
         [SerializeField] float2 _temperatureRange = new float2(-45.0f, 45.0f);
         public float2 TemperatureRange => _temperatureRange;
-        
-        [SerializeField] NoiseProfile_SO _heightNoise;
-        public NoiseProfile_SO HeightNoise => _heightNoise;
 
-        [SerializeField] NoiseProfile_SO _caveNoise;
-        public NoiseProfile_SO CaveNoise => _caveNoise;
+        [SerializeField] NoiseProfile_SO _humidityNoise;
+        public NoiseProfile_SO HumidityNoise => _humidityNoise;
+
+        [SerializeField] NoiseProfile_SO _temperatureNoise;
+        public NoiseProfile_SO TemperatureNoise => _temperatureNoise;
     }
 }

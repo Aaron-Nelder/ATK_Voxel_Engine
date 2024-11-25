@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 867a944c6390eda45a4a874db7bc9116, type: 3}
   m_Name: Grass
   m_EditorClassIdentifier: 
-  _id: 1
-  _name: Grass
-  _materialIndex: 0
-  _textureIndex: {x: 0, y: 0}
-  _oldMeshData: {fileID: 0}
+  _type: 1
   _meshData: {fileID: 11400000, guid: 783c0823714947b41b3cb349e87cf691, type: 2}
+  _hasCollision: 1
+  _isTransparent: 0
+  _isDirectionBased: 0

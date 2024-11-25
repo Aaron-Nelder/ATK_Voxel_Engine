@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Player_Motion_Stats
   m_EditorClassIdentifier: 
   _mass: 62
-  _drag: 0
+  _drag: 1
   _angularDrag: 0
   _groundedLayers:
     serializedVersion: 2

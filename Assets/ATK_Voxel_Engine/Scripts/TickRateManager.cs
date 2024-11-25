@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace ATKVoxelEngine
 {
-    public enum TickType { UPDATE, FIXED_UPDATE, LATE_UPDATE, ENGINE, CHUNK, PLAYER, ENTITY, CHUNK_LOAD }
-
     public interface ITickable
     {
         public abstract TickType TickType { get; }

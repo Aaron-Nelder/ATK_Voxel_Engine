@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 867a944c6390eda45a4a874db7bc9116, type: 3}
   m_Name: Stone
   m_EditorClassIdentifier: 
-  _id: 3
-  _name: Stone
+  _type: 3
   _meshData: {fileID: 11400000, guid: 9213aa1f36e172d46826a04172c5b930, type: 2}
+  _hasCollision: 1
+  _isTransparent: 0
+  _isDirectionBased: 0

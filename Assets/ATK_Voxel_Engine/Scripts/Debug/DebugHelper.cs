@@ -6,7 +6,7 @@ namespace ATKVoxelEngine
 {
     public static class DebugHelper
     {
-        static bool debugging = true;
+        static bool debugging = false;
         public static bool Debugging
         {
             get => debugging;
@@ -19,20 +19,19 @@ namespace ATKVoxelEngine
 
         public static Action<bool> OnDebugging;
 
-        static int lastframes = 0;
-        static float lastTime = 0.0f;
+        static float lastGetTime = 0;
+        static int lastFrameCount = 0;
         public static string FPS
         {
             get
             {
-                int frameDif = Time.frameCount - lastframes;
-                lastframes = Time.frameCount;
+                int frameCount = Time.frameCount - lastFrameCount;
+                float time = Time.time - lastGetTime;
+                int fps = (int)(frameCount / time);
 
-                float timeDif = Time.unscaledTime - lastTime;
-
-                float fpsCounter = frameDif / timeDif;
-                lastTime = Time.unscaledTime;
-                return string.Format("{0:0.} FPS", fpsCounter);
+                lastGetTime = Time.time;
+                lastFrameCount = Time.frameCount;
+                return $"FPS: {MathF.Round(fps).ToString()}";
             }
         }
 

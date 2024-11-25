@@ -6,322 +6,24 @@ using Unity.Burst;
 namespace ATKVoxelEngine
 {
     [BurstCompile]
-    public struct GetNoise2DJob : IJob
+    public struct AssignVoxelsJob : IJob
     {
-        int2 _noiseSize, _offset;
-        float _amplitude, _frequency;
-        uint _seed, _magClamp;
-        float2 _scale;
-        ushort _octaves;
-
-        NativeArray<int> _noiseMap;
-        NativeArray<float> _octavesOffset;
-
-        public GetNoise2DJob(WorldSettings_SO wSettings, NoiseProfile_SO noiseSettings, int3 wPos, ref NativeArray<int> noise, ref NativeArray<float> octavesOffset)
-        {
-            _noiseSize = new int2(wSettings.ChunkSize.x, wSettings.ChunkSize.z);
-            _scale = noiseSettings.Scale;
-            _seed = wSettings.Seed;
-            _octaves = (ushort)noiseSettings.Octaves;
-            _amplitude = noiseSettings.Amplitude;
-            _magClamp = noiseSettings.MagClamp;
-            _frequency = noiseSettings.Frequency;
-            _offset.x = wPos.x;
-            _offset.y = wPos.z;
-
-            _noiseMap = noise;
-            _octavesOffset = octavesOffset;
-        }
-
-        public void Execute()
-        {
-            Random random = new Random(_seed);
-
-            // create a max possible value for noise
-            float maxPossibleNoiseValue = 0;
-            float amplitude = 1;
-            float frequency = 1;
-
-            for (int i = 0; i < _octavesOffset.Length; i += 2)
-            {
-                _octavesOffset[i] = random.NextFloat(-100000, 100000) + _offset.x;
-                _octavesOffset[i + 1] = random.NextFloat(-100000, 100000) + _offset.y;
-
-                maxPossibleNoiseValue += amplitude;
-                amplitude *= _amplitude;
-            }
-
-            float halfWidth = _noiseSize.x / 2.0f;
-            float halfHeight = _noiseSize.y / 2.0f;
-
-            // loop through the noise map
-            for (int x = 0; x < _noiseSize.x; x++)
-            {
-                for (int y = 0; y < _noiseSize.y; y++)
-                {
-                    amplitude = 1;
-                    frequency = 1;
-                    float noiseHeight = 0;
-
-                    for (int i = 0; i < _octavesOffset.Length; i += 2)
-                    {
-                        float sampleX = (x - halfWidth + _octavesOffset[i]) / _scale.x * frequency;
-                        float sampleY = (y - halfHeight + _octavesOffset[i + 1]) / _scale.y * frequency;
-
-                        float value = noise.pnoise(new float2(sampleX, sampleY), new float2(sampleX, sampleY) * 2 - 1);
-
-                        noiseHeight += value * amplitude;
-
-                        amplitude *= _amplitude;
-                        frequency *= _frequency;
-                    }
-
-                    // Normalize the noiseHeight to be within the range of 0 to 1
-                    noiseHeight = (noiseHeight + maxPossibleNoiseValue) / (2 * maxPossibleNoiseValue);
-                    _noiseMap[x + y * _noiseSize.x] = (ushort)math.floor(noiseHeight * _magClamp);
-                }
-            }
-        }
-    }
-
-    [BurstCompile]
-    public struct GetNoise3DJob : IJob
-    {
-        int3 _noiseSize;
-        float3 _scale;
-        uint _seed;
-        ushort _octaves;
-        float _amplitude;
-        float _frequency;
-        int3 _offset;
-        float2 _caveThreshold;
-
-        NativeArray<int> _noiseMap;
-        NativeArray<float> _octavesOffset;
-
-        public GetNoise3DJob(WorldSettings_SO settings, NoiseProfile_SO noiseSettings, int3 wPos, ref NativeArray<int> _noise, ref NativeArray<float> octavesOffset)
-        {
-            _noiseSize = settings.ChunkSize;
-            _scale = noiseSettings.Scale;
-            _seed = settings.Seed;
-            _octaves = (ushort)noiseSettings.Octaves;
-            _amplitude = noiseSettings.Amplitude;
-            _frequency = noiseSettings.Frequency;
-            _offset = wPos;
-            _caveThreshold = noiseSettings.Threshold;
-
-            _noiseMap = _noise;
-            _octavesOffset = octavesOffset;
-        }
-
-        public void Execute()
-        {
-            Random random = new Random(_seed);
-
-            // create a max possible value for noise
-            float maxPossibleNoiseValue = 0;
-            float amplitude = 1;
-            float frequency = 1;
-
-            for (int i = 0; i < _octavesOffset.Length; i += 3)
-            {
-                _octavesOffset[i] = random.NextFloat(-100000, 100000) + _offset.x;
-                _octavesOffset[i + 1] = random.NextFloat(-100000, 100000) + _offset.y;
-                _octavesOffset[i + 2] = random.NextFloat(-100000, 100000) + _offset.z;
-
-                maxPossibleNoiseValue += amplitude;
-                amplitude *= _amplitude;
-            }
-
-            // loop through the noise map
-            for (int x = 0; x < _noiseSize.x; x++)
-            {
-                for (int y = 0; y < _noiseSize.y; y++)
-                {
-                    for (int z = 0; z < _noiseSize.z; z++)
-                    {
-                        amplitude = 1;
-                        frequency = 1;
-                        float noiseValue = 0;
-
-                        for (int i = 0; i < _octavesOffset.Length; i += 3)
-                        {
-                            float sampleX = (x + _octavesOffset[i]) / _scale.x * frequency;
-                            float sampleY = (y + _octavesOffset[i + 1]) / _scale.y * frequency;
-                            float sampleZ = (z + _octavesOffset[i + 2]) / _scale.z * frequency;
-                            float value = noise.snoise(new float3(sampleX, sampleY, sampleZ));
-                            noiseValue += value * amplitude;
-                            amplitude *= _amplitude;
-                            frequency *= _frequency;
-                        }
-
-                        // Normalize the noiseValue to be within the range of 0 to 1
-                        noiseValue = (noiseValue + maxPossibleNoiseValue) / (2 * maxPossibleNoiseValue);
-
-                        // if the noiseValue is below the caveThreshold, set the voxel to air (0)
-                        if (noiseValue < _caveThreshold.x || noiseValue > _caveThreshold.y)
-                            _noiseMap[x + y * _noiseSize.x + z * _noiseSize.x * _noiseSize.y] = 0;
-                        else
-                            _noiseMap[x + y * _noiseSize.x + z * _noiseSize.x * _noiseSize.y] = 1;
-                    }
-                }
-            }
-        }
-    }
-
-    [BurstCompile]
-    public struct GenerateTerrainJob : IJob
-    {
-        NativeArray<uint> _voxels;
-        readonly int3 _chunkSize;
-        uint _seed;
-        int3 _offset;
-
-        float _hNoiseAmplitude, _hNoiseFrequency;
-        uint _hNoiseMagClamp;
-        float2 _hNoiseScale;
-        ushort _hNoiseOctaves;
+        NativeArray<VoxelType> _voxels;
         NativeArray<int> _hNoiseMap;
-        NativeArray<float> _hNoiseOctavesOffset;
-
-        float3 _cNoiseScale;
-        ushort _cNoiseOctaves;
-        float _cNoiseAmplitude, _cNoiseFrequency;
-        float2 _cNoiseThreshold;
         NativeArray<int> _cNoiseMap;
-        NativeArray<float> _cNoiseOctavesOffset;
+        readonly int3 _chunkSize;
 
-        public GenerateTerrainJob(NativeArray<uint> voxels, WorldSettings_SO wSettings, int3 wPos, NativeArray<int> hNoiseMap, NativeArray<float> hNoiseOctavesOffset, NativeArray<int> cNoiseMap, NativeArray<float> cNoiseOctavesOffset)
+        public AssignVoxelsJob(NativeArray<VoxelType> voxels, int3 chunkSize, NativeArray<int> hNoiseMap, NativeArray<int> cNoiseMap)
         {
             _voxels = voxels;
-            _chunkSize = wSettings.ChunkSize;
-            _seed = wSettings.Seed;
-            _offset = wPos;
-
-            _hNoiseScale = wSettings.HeightNoise.Scale;
-            _hNoiseOctaves = (ushort)wSettings.HeightNoise.Octaves;
-            _hNoiseAmplitude = wSettings.HeightNoise.Amplitude;
-            _hNoiseFrequency = wSettings.HeightNoise.Frequency;
-            _hNoiseMagClamp = wSettings.HeightNoise.MagClamp;
+            _chunkSize = chunkSize;
             _hNoiseMap = hNoiseMap;
-            _hNoiseOctavesOffset = hNoiseOctavesOffset;
-
-            _cNoiseScale = wSettings.CaveNoise.Scale;
-            _cNoiseOctaves = (ushort)wSettings.CaveNoise.Octaves;
-            _cNoiseAmplitude = wSettings.CaveNoise.Amplitude;
-            _cNoiseFrequency = wSettings.CaveNoise.Frequency;
-            _cNoiseThreshold = wSettings.CaveNoise.Threshold;
             _cNoiseMap = cNoiseMap;
-            _cNoiseOctavesOffset = cNoiseOctavesOffset;
         }
 
         public void Execute()
         {
-            Random random = new Random(_seed);
-            GenerateHeightNoise(ref random);
-            GenerateCaveNoise(ref random);
             AssignVoxels();
-        }
-
-        void GenerateHeightNoise(ref Random random)
-        {
-            // create a max possible value for noise
-            float maxPossibleNoiseValue = 0;
-            float amplitude = 1;
-            float frequency = 1;
-
-            for (int i = 0; i < _hNoiseOctavesOffset.Length; i += 2)
-            {
-                _hNoiseOctavesOffset[i] = random.NextFloat(-100000, 100000) + _offset.x;
-                _hNoiseOctavesOffset[i + 1] = random.NextFloat(-100000, 100000) + _offset.z;
-
-                maxPossibleNoiseValue += amplitude;
-                amplitude *= _hNoiseAmplitude;
-            }
-
-            float halfWidth = _chunkSize.x / 2.0f;
-            float halfHeight = _chunkSize.z / 2.0f;
-
-            // loop through the noise map
-            for (int x = 0; x < _chunkSize.x; x++)
-            {
-                for (int y = 0; y < _chunkSize.z; y++)
-                {
-                    amplitude = 1;
-                    frequency = 1;
-                    float noiseHeight = 0;
-
-                    for (int i = 0; i < _hNoiseOctavesOffset.Length; i += 2)
-                    {
-                        float sampleX = (x - halfWidth + _hNoiseOctavesOffset[i]) / _hNoiseScale.x * frequency;
-                        float sampleY = (y - halfHeight + _hNoiseOctavesOffset[i + 1]) / _hNoiseScale.y * frequency;
-
-                        float value = noise.pnoise(new float2(sampleX, sampleY), new float2(sampleX, sampleY) * 2 - 1);
-
-                        //float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
-                        noiseHeight += value * amplitude;
-
-                        amplitude *= _hNoiseAmplitude;
-                        frequency *= _hNoiseFrequency;
-                    }
-
-                    // Normalize the noiseHeight to be within the range of 0 to 1
-                    noiseHeight = (noiseHeight + maxPossibleNoiseValue) / (2 * maxPossibleNoiseValue);
-                    _hNoiseMap[x + y * _chunkSize.x] = (ushort)math.floor(noiseHeight * _hNoiseMagClamp);
-                }
-            }
-        }
-
-        void GenerateCaveNoise(ref Random random)
-        {
-            // create a max possible value for noise
-            float maxPossibleNoiseValue = 0;
-            float amplitude = 1;
-            float frequency = 1;
-
-            for (int i = 0; i < _cNoiseOctavesOffset.Length; i += 3)
-            {
-                _cNoiseOctavesOffset[i] = random.NextFloat(-100000, 100000) + _offset.x;
-                _cNoiseOctavesOffset[i + 1] = random.NextFloat(-100000, 100000) + _offset.y;
-                _cNoiseOctavesOffset[i + 2] = random.NextFloat(-100000, 100000) + _offset.z;
-
-                maxPossibleNoiseValue += amplitude;
-                amplitude *= _cNoiseAmplitude;
-            }
-
-            // loop through the noise map
-            for (int x = 0; x < _chunkSize.x; x++)
-            {
-                for (int y = 0; y < _chunkSize.y; y++)
-                {
-                    for (int z = 0; z < _chunkSize.z; z++)
-                    {
-                        amplitude = 1;
-                        frequency = 1;
-                        float noiseValue = 0;
-
-                        for (int i = 0; i < _cNoiseOctavesOffset.Length; i += 3)
-                        {
-                            float sampleX = (x + _cNoiseOctavesOffset[i]) / _cNoiseScale.x * frequency;
-                            float sampleY = (y + _cNoiseOctavesOffset[i + 1]) / _cNoiseScale.y * frequency;
-                            float sampleZ = (z + _cNoiseOctavesOffset[i + 2]) / _cNoiseScale.z * frequency;
-                            float value = noise.snoise(new float3(sampleX, sampleY, sampleZ));
-                            noiseValue += value * amplitude;
-                            amplitude *= _cNoiseAmplitude;
-                            frequency *= _cNoiseFrequency;
-                        }
-
-                        // Normalize the noiseValue to be within the range of 0 to 1
-                        noiseValue = (noiseValue + maxPossibleNoiseValue) / (2 * maxPossibleNoiseValue);
-
-                        // if the noiseValue is below the caveThreshold, set the voxel to air (0)
-                        if (noiseValue < _cNoiseThreshold.x || noiseValue > _cNoiseThreshold.y)
-                            _cNoiseMap[x + y * _chunkSize.x + z * _chunkSize.x * _chunkSize.y] = 0;
-                        else
-                            _cNoiseMap[x + y * _chunkSize.x + z * _chunkSize.x * _chunkSize.y] = 1;
-                    }
-                }
-            }
         }
 
         void AssignVoxels()
@@ -343,23 +45,27 @@ namespace ATKVoxelEngine
             }
         }
 
-        uint SetVoxel(int3 pos, int surfaceHeight)
+        VoxelType SetVoxel(int3 pos, int surfaceHeight)
         {
-            bool isVoxel = _cNoiseMap[PosToIndex3D(pos.x, pos.y, pos.z)] == 1;
+            bool isVoxel = _cNoiseMap[PosToIndex3D(pos.x, pos.y, pos.z)] == 0;
+            //isVoxel = true;
 
             // BEDROCK
             if (pos.y == 0)
-                return 3;
+                return VoxelType.STONE;
 
-            if (pos.y == surfaceHeight)
-                return 1;
+            if (pos.y == surfaceHeight && isVoxel)
+                return VoxelType.GRASS;
 
             // Top Soil
             else if (surfaceHeight - pos.y < 3 && isVoxel)
-                return 2;
+                return VoxelType.DIRT;
+
+            if (surfaceHeight == 0)
+                return VoxelType.STONE;
 
             // Underground
-            return (uint)(isVoxel ? 3 : 0);
+            return (isVoxel ? VoxelType.STONE : VoxelType.AIR);
         }
 
         int PosToIndex3D(int x, int y, int z) => x + y * _chunkSize.x + z * _chunkSize.x * _chunkSize.y;
@@ -368,36 +74,36 @@ namespace ATKVoxelEngine
     [BurstCompile]
     public struct VisibleVoxelsJob : IJob
     {
-        [ReadOnly] public NativeArray<uint> VoxelIds; // the IDs of each voxel in the chunk
-        public NativeArray<int> result;
-        public int3 chunkSize; // the size of the chunk in voxels
+        NativeArray<VoxelType> _voxels;
+        NativeArray<int> _results;
+        int3 _chunkSize;
 
-        public VisibleVoxelsJob(NativeArray<uint> voxelIds, NativeArray<int> resuts, int3 chunkSize)
+        public VisibleVoxelsJob(NativeArray<VoxelType> voxelIds, NativeArray<int> resuts, int3 chunkSize)
         {
-            VoxelIds = voxelIds;
-            result = resuts;
-            this.chunkSize = chunkSize;
+            _voxels = voxelIds;
+            _results = resuts;
+            _chunkSize = chunkSize;
         }
 
         public void Execute()
         {
-            for (int i = 0; i < result.Length; i++)
+            for (int i = 0; i < _results.Length; i++)
             {
                 // returns 0 if the voxel is air
-                if (VoxelIds[i] == 0)
+                if (_voxels[i] == 0)
                 {
-                    result[i] = 0;
+                    _results[i] = 0;
                     continue;
                 }
 
                 // Get the 3D position of the voxel
-                int3 vPosInChunk = new int3(i % chunkSize.x, (i / chunkSize.x) % chunkSize.y, i / (chunkSize.x * chunkSize.y));
+                int3 vPosInChunk = new int3(i % _chunkSize.x, (i / _chunkSize.x) % _chunkSize.y, i / (_chunkSize.x * _chunkSize.y));
                 int visibleSides = 0;
                 for (int j = 0; j < EngineUtilities.Directions.Length; j++)
                     SetVisibility(ref visibleSides, vPosInChunk + EngineUtilities.Directions[j], j);
 
                 // Write the result to the output buffer
-                result[i] = visibleSides;
+                _results[i] = visibleSides;
             }
         }
 
@@ -407,9 +113,9 @@ namespace ATKVoxelEngine
         // checks if a position is within the bounds of the chunk
         bool InBounds(int3 pos)
         {
-            return pos.x >= 0 && pos.x < chunkSize.x &&
-                   pos.y >= 0 && pos.y < chunkSize.y &&
-                   pos.z >= 0 && pos.z < chunkSize.z;
+            return pos.x >= 0 && pos.x < _chunkSize.x &&
+                   pos.y >= 0 && pos.y < _chunkSize.y &&
+                   pos.z >= 0 && pos.z < _chunkSize.z;
         }
 
         void SetVisibility(ref int visInt, int3 voxelPos, int bitPos)
@@ -417,8 +123,8 @@ namespace ATKVoxelEngine
             // if the voxel is in bounds, check if it is air, if it is, set the bit
             if (InBounds(voxelPos))
             {
-                int index = voxelPos.x + voxelPos.y * chunkSize.x + voxelPos.z * chunkSize.x * chunkSize.y;
-                if (VoxelIds[index] == 0)
+                int index = voxelPos.x + voxelPos.y * _chunkSize.x + voxelPos.z * _chunkSize.x * _chunkSize.y;
+                if (_voxels[index] == 0)
                     SetBit(ref visInt, bitPos);
             }
 
@@ -440,6 +146,118 @@ namespace ATKVoxelEngine
         public void Execute()
         {
             UnityEngine.Physics.BakeMesh(_meshId, false);
+        }
+    }
+
+    struct GenerateFolliageJob : IJob
+    {
+        NativeArray<Folliage> _folliages;
+        NativeArray<int> _surfaceHeight;
+        NativeArray<int> _folliageNoise;
+        NativeArray<VoxelType> _voxels;
+        int3 _chunkSize;
+        uint _seed;
+        ChunkPosition _chunkPos;
+
+        public GenerateFolliageJob(uint seed, ChunkPosition chunkPos, NativeArray<Folliage> folliages, NativeArray<VoxelType> voxels, NativeArray<int> surfaceHeight, NativeArray<int> folliageNoise, int3 chunkSize)
+        {
+            _seed = seed;
+            _folliages = folliages;
+            _voxels = voxels;
+            _surfaceHeight = surfaceHeight;
+            _folliageNoise = folliageNoise;
+            _chunkSize = chunkSize;
+            _chunkPos = chunkPos;
+        }
+
+        const int MAX_TRIES = 25;
+        public void Execute()
+        {
+            Random rng = new Random(_seed + (uint)math.abs((_chunkPos.x - _chunkPos.z)));
+            int tries = 0;
+            int placed = 0;
+
+            // Loops though all types of folliage
+            for (int i = 0; i < _folliages.Length; i++)
+            {
+                // TODO:: Don't rely on class
+                FolliageData_SO folliageData = EngineSettings.GetFolliageData(_folliages[i].type);               
+
+                for (int j = 0; j < MAX_TRIES; j++)
+                {
+                    if (placed >= (uint)_folliages[i].density)
+                        break;
+
+                    // Gets a random x and z position within the chunk
+                    int3 surfacePos;
+                    surfacePos.x = rng.NextInt(0, _chunkSize.x);
+                    surfacePos.z = rng.NextInt(0, _chunkSize.z);
+
+                    // Checks the noise map for if folliage is allowed to be placed at the position
+                    if (_folliageNoise[surfacePos.x + (surfacePos.z * _chunkSize.x)] != 1)
+                    {
+                        tries++;
+                        continue;
+                    }
+
+                    surfacePos.y = _surfaceHeight[surfacePos.x + (surfacePos.z * _chunkSize.x)];
+
+                    VoxelType surfaceVoxel = _voxels[surfacePos.x + surfacePos.y * _chunkSize.x + surfacePos.z * _chunkSize.x * _chunkSize.y];
+
+                    bool isPlaceable = false;
+
+                    // Loops through all the placeable voxels for the folliage
+                    for (int k = 0; k < folliageData.PlaceableVoxels.Length; k++)
+                    {
+                        if (surfaceVoxel == folliageData.PlaceableVoxels[k])
+                        {
+                            isPlaceable = true;
+                            break;
+                        }
+                    }
+
+                    if (!isPlaceable)
+                    {
+                        tries++;
+                        continue;
+                    }
+
+                    // If the voxel at the surface position is a placeable voxel for the folliage
+
+                    bool inBounds = true;
+                    VoxelStructure structure = folliageData.GetRandomFolliage(ref rng);
+                    for (int k = 0; k < structure.Positions.Length; k++)
+                    {
+                        int3 voxelPos = structure.Positions[k] + surfacePos + new int3(0, 1, 0);
+                        if (!IsVoxelPosInChunk(voxelPos, _chunkSize) || _voxels[voxelPos.x + voxelPos.y * _chunkSize.x + voxelPos.z * _chunkSize.x * _chunkSize.y] != VoxelType.AIR)
+                        {
+                            inBounds = false;
+                            break;
+                        }
+                    }
+
+                    if (!inBounds)
+                    {
+                        tries++;
+                        continue;
+                    }
+
+                    for (int k = 0; k < structure.Positions.Length; k++)
+                    {
+                        int3 voxelPos = structure.Positions[k] + surfacePos + new int3(0, 1, 0);
+                        _voxels[voxelPos.x + voxelPos.y * _chunkSize.x + voxelPos.z * _chunkSize.x * _chunkSize.y] = structure.Ids[k];
+                    }
+                }
+                tries++;
+            }
+        }
+
+        bool IsVoxelPosInChunk(int3 pos, int3 chunkSize)
+        {
+            if (pos.x < 0 || pos.x >= chunkSize.x) return false;
+            if (pos.y <= 0 || pos.y >= chunkSize.y - 1) return false;
+            if (pos.z < 0 || pos.z >= chunkSize.z) return false;
+            return true;
         }
     }
 }

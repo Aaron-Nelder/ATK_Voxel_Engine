@@ -1,26 +1,28 @@
 using UnityEngine;
-using ATKVoxelEngine;
 
-public class HeldVoxel: MonoBehaviour 
+namespace ATKVoxelEngine
 {
-    Transform _handTransform;
-    VoxelData_SO _data;
-    public uint Id => _data.Id;
-
-    [SerializeField] MeshFilter _filter;
-    [SerializeField] MeshRenderer _renderer;
-
-    public HeldVoxel Init(Transform handTransform, VoxelData_SO data)
+    public class HeldVoxel : MonoBehaviour
     {
-        _handTransform = handTransform;
-        _data = data;
-        AssignMesh(data);
-        return this;
-    }
+        Transform _handTransform;
+        VoxelData_SO _data;
+        public VoxelType Id => _data.Id;
 
-    void AssignMesh(VoxelData_SO data)
-    {
-        _filter.mesh = data.MeshData.MeshInstance;
-        _renderer.material = data.MeshData.Material;
+        [SerializeField] MeshFilter _filter;
+        [SerializeField] MeshRenderer _renderer;
+
+        public HeldVoxel Init(Transform handTransform, VoxelData_SO data)
+        {
+            _handTransform = handTransform;
+            _data = data;
+            AssignMesh(data);
+            return this;
+        }
+
+        void AssignMesh(VoxelData_SO data)
+        {
+            _filter.mesh = data.MeshData.MeshInstance;
+            _renderer.material = data.MeshData.Material;
+        }
     }
 }

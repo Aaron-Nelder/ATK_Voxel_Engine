@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9dac93a8cdb4a0419b2a60132bdd489, type: 3}
+  m_Name: Plains Height Noise
+  m_EditorClassIdentifier: 
+  _dimension: 0
+  _type: 2
+  _scale:
+    x: 75
+    y: 50
+    z: 75
+  _amplitude: 1
+  _frequency: 0.125
+  _octaves: 3
+  _lacunarity: 1.52
+  _persistence: 1
+  _rotation: 0
+  _multiplier: 100
+  _useThreshold: 0
+  _threshold:
+    x: 0
+    y: 0

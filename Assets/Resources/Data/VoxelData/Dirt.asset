@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 867a944c6390eda45a4a874db7bc9116, type: 3}
   m_Name: Dirt
   m_EditorClassIdentifier: 
-  _id: 2
-  _name: Dirt
+  _type: 2
   _meshData: {fileID: 11400000, guid: ea168f716caf330439a3c313ccc83ddf, type: 2}
+  _hasCollision: 1
+  _isTransparent: 0
+  _isDirectionBased: 0

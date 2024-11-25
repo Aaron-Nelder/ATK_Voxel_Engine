@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe5a42b7882c7384a9c38dead195329d, type: 3}
+  m_Name: Plains
+  m_EditorClassIdentifier: 
+  _biomeType: 1
+  _biomeSize: 16
+  _habitability: 1
+  _hostility: 1
+  _folliage:
+  - type: 1
+    density: 3
+  _surfaceVoxel: 1
+  _subSurfaceVoxel: 2
+  _elevation:
+    x: 0
+    y: 128
+  _temperature:
+    x: 0
+    y: 45
+  _humidity:
+    x: 1
+    y: 1
+  _heightNoise: {fileID: 11400000, guid: a9a8741e53e111a4688e7bbd36c21117, type: 2}
+  _caveNoise: {fileID: 11400000, guid: 3b7ddc7d1e5b4424882821f4921398d3, type: 2}
+  _folliageNoise: {fileID: 11400000, guid: f3c3a8a6f2722fa4d8b7c4854b7fce3a, type: 2}

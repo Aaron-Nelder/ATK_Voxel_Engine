@@ -16,6 +16,8 @@ namespace ATKVoxelEngine.EditorManager
         public static WorldSettings_SO WorldSettings => EngineSettings.WorldSettings;
         public static DebugSettings_SO DebugSettings => EngineSettings.DebugSettings;
 
+        static bool VerifyScripts => Object.FindAnyObjectByType<EngineManager>() && Object.FindAnyObjectByType<PlayerManager>();
+
         // GUI Styles
         static GUIStyle _defaultLabel;
         static GUIStyle _defaultHeader;
@@ -27,11 +29,18 @@ namespace ATKVoxelEngine.EditorManager
         static Mesh _customMesh;
         static VoxelMeshData_SO _meshData;
         static int _selectedPlaneIndex = -1;
+        static string _fps;
 
         static EngineEditorManager()
         {
             SceneView.duringSceneGui += OnSceneGUI;
             SceneView.duringSceneGui += Tick;
+            
+            EditorApplication.update += () => 
+            {
+                SceneView.RepaintAll();
+                _fps = DebugHelper.FPS;
+            };
 
             if (PlayerManager.Instance == null)
                 PlayerManager.Instance = GameObject.FindFirstObjectByType<PlayerManager>();
@@ -42,6 +51,9 @@ namespace ATKVoxelEngine.EditorManager
         #region Tick
         static void Tick(SceneView sceneView)
         {
+            if (!VerifyScripts)
+                return;
+
             switch (EditorMode)
             {
                 case EditorMode.IN_GAME:
@@ -209,10 +221,13 @@ namespace ATKVoxelEngine.EditorManager
         }
         #endregion
 
+
         #region SceneGUI      
         // Draws the scene GUI labels
         static void OnSceneGUI(SceneView sceneView)
         {
+            if (!VerifyScripts) return;
+
             Handles.BeginGUI();
 
             EditorGUI.LabelField(new(10, 10, 200, 200), $"EditorMode: {EditorMode.ToString()}", GetHeaderStyle(EditorMode));
@@ -236,7 +251,7 @@ namespace ATKVoxelEngine.EditorManager
             Rect rect = new(10, -50, 200, 200);
             if (DebugSettings.editorShowFPS)
             {
-                EditorGUI.LabelField(rect, $"FPS: {DebugHelper.FPS}", _defaultLabel);
+                EditorGUI.LabelField(rect, $"{_fps}", _defaultLabel);
                 rect.y += 20;
             }
 

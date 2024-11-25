@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -38,8 +39,6 @@ namespace ATKVoxelEngine
             _lastKnownPlayerChunk = currentChunk;
 
             RefreshRenderDistance(currentChunk);
-            //UnloadRenderDistance(currentChunk, dir);
-            //LoadRenderDistance(currentChunk, dir);
         }
 
         static void RefreshRenderDistance(ChunkPosition chunkPos)
@@ -55,7 +54,7 @@ namespace ATKVoxelEngine
             for (int x = -halfRendDis; x < halfRendDis + 1; x++)
                 for (int z = -halfRendDis; z < halfRendDis + 1; z++)
                     if (!Chunks.ContainsKey(new(chunkPos.x + x, chunkPos.z + z)))
-                        ChunkLoadManager.QueueChunkForLoad(new(chunkPos.x + x, chunkPos.z + z));
+                        ChunkLoadManager.QueueForLoad(new(chunkPos.x + x, chunkPos.z + z));
         }
 
         // Generates the starting chunks for the game
@@ -64,25 +63,19 @@ namespace ATKVoxelEngine
             int interval = EngineSettings.WorldSettings.RenderDistance / 2;
             for (int x = -interval; x < interval + 1; x += 1)
                 for (int z = -interval; z < interval + 1; z += 1)
-                    ChunkLoadManager.QueueChunkForLoad(new(x, z), true);
+                    ChunkLoadManager.QueueForLoad(new(x, z), true);
         }
 
         // Get's a chunk prefab from the pool and starts loading it
-        public static void GenerateChunk(ChunkPosition pos, bool useThreads = true)
+        public static void GenerateChunk(ChunkPosition pos, bool isEditor = true)
         {
             if (Chunks.ContainsKey(pos)) return;
 
-            GameObject chunkObj;
-
-            if (useThreads)
-                chunkObj = EngineManager.Instance.Pool.ChunkOBJPool.Get();
-            else
-                chunkObj = GameObject.Instantiate(EngineSettings.WorldSettings.ChunkPrefab);
-
+            GameObject chunkObj = isEditor ? EngineManager.Instance.Pool.ChunkOBJPool.Get() : GameObject.Instantiate(EngineSettings.WorldSettings.ChunkPrefab);
             chunkObj.transform.position = EngineUtilities.ChunkPosToWorldPosVec3(pos);
             chunkObj.transform.SetParent(chunkParent);
             chunkObj.name = $"Chunk: ({pos.x},{pos.z})";
-            chunkObj.GetComponent<Chunk>().Startup(pos, useThreads);
+            chunkObj.GetComponent<Chunk>().Initialize(pos);
         }
 
         // Disposes of all chunks
@@ -94,7 +87,11 @@ namespace ATKVoxelEngine
         }
 
         #region Editor
-        public static void PreviewChunkEditor(ChunkPosition pos) => GenerateChunk(pos, false);
+        public static void PreviewChunkEditor(ChunkPosition pos)
+        {
+            EngineSettings.GatherSO();
+            GenerateChunk(pos, false);
+        }
         #endregion
     }
 
@@ -124,11 +121,11 @@ namespace ATKVoxelEngine
         public override int GetHashCode() => x.GetHashCode() ^ z.GetHashCode();
         public override string ToString() => $"({x}, {z})";
 
-        public static ChunkPosition Zero => new ChunkPosition(0, 0);
-        public static ChunkPosition One => new ChunkPosition(1, 1);
-        public static ChunkPosition Forward => new ChunkPosition(0, 1);
-        public static ChunkPosition Back => new ChunkPosition(0, -1);
-        public static ChunkPosition Right => new ChunkPosition(1, 0);
-        public static ChunkPosition Left => new ChunkPosition(-1, 0);
+        public static ChunkPosition zero => new ChunkPosition(0, 0);
+        public static ChunkPosition one => new ChunkPosition(1, 1);
+        public static ChunkPosition forward => new ChunkPosition(0, 1);
+        public static ChunkPosition back => new ChunkPosition(0, -1);
+        public static ChunkPosition right => new ChunkPosition(1, 0);
+        public static ChunkPosition left => new ChunkPosition(-1, 0);
     }
 }

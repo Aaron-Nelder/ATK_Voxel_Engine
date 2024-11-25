@@ -1,5 +1,6 @@
 using UnityEngine;
 using ATKVoxelEngine;
+using Unity.Mathematics;
 
 public static class PlayerHelper
 {
@@ -15,7 +16,7 @@ public static class PlayerHelper
 
         for (int y = (int)playerPos.y; y > 0; y--)
         {
-            if (chunk.GetVoxel(voxelX, y, voxelZ) != 0)
+            if (chunk.Data.GetVoxel(voxelX, y, voxelZ) != 0)
             {
                 PlayerManager.Instance.MotionHandler.Rigidbody.position = new Vector3(playerPos.x, y + 0.5f, playerPos.z);
                 break;
@@ -39,17 +40,17 @@ public static class PlayerHelper
         }
     }
 
-    public static Vector3Int PlayerVoxelPosition
+    public static int3 PlayerVoxelPosition
     {
         get
         {
             if (PlayerManager.Instance is null)
             {
                 Debug.LogWarning(REF_WARINGING);
-                return new Vector3Int(0, 0, 0);
+                return int3.zero;
             }
-
-            return Vector3Int.RoundToInt(PlayerManager.Instance.transform.position);
+            float3 floatVal = math.round(PlayerManager.Instance.transform.position);
+            return new int3((int)floatVal.x, (int)floatVal.y+1, (int)floatVal.z);
         }
     }
 }

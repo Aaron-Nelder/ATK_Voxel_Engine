@@ -14,6 +14,7 @@ namespace ATKVoxelEngine
 
         VisualElement _heightVE;
         VisualElement _caveVE;
+        VisualElement _folliageVE;
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -27,7 +28,6 @@ namespace ATKVoxelEngine
             headerLabel.text = _target.name;
 
             Clamps();
-
             NoiseFields();
 
             // Return the finished Inspector UI.
@@ -86,6 +86,7 @@ namespace ATKVoxelEngine
         {
             ObjectField heightNoiseSO = _inspector.Q<ObjectField>("HeightNoise");
             ObjectField chunkNoiseSO = _inspector.Q<ObjectField>("CaveNoise");
+            ObjectField folliageNoiseSO = _inspector.Q<ObjectField>("FolliageNoise");
             Foldout noiseFoldout = _inspector.Q<Foldout>("NoiseParameters");
 
             heightNoiseSO.RegisterValueChangedCallback((evt) =>
@@ -121,6 +122,24 @@ namespace ATKVoxelEngine
                     _caveVE.Bind(new SerializedObject(_target.CaveNoise));
                     noiseFoldout.Add(_caveVE);
                     _caveVE.style.display = DisplayStyle.Flex;
+                }
+            });
+
+            folliageNoiseSO.RegisterValueChangedCallback((evt) =>
+            {
+                if (evt.newValue is null && _folliageVE != null)
+                    _folliageVE.RemoveFromHierarchy();
+                else if (evt.newValue is not null)
+                {
+                    if (_folliageVE != null)
+                        _folliageVE.RemoveFromHierarchy();
+
+                    NoiseProfileEditor folliageEditor = CreateInstance<NoiseProfileEditor>();
+                    folliageEditor.InitElements(_target.FolliageNoise);
+                    _folliageVE = folliageEditor.CreateInspectorGUI();
+                    _folliageVE.Bind(new SerializedObject(_target.FolliageNoise));
+                    noiseFoldout.Add(_folliageVE);
+                    _folliageVE.style.display = DisplayStyle.Flex;
                 }
             });
         }

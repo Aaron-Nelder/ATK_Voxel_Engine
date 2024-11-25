@@ -27,7 +27,6 @@ namespace ATKVoxelEngine
                 return;
 
             ChunkManager.SpawnStartingChunks(transform);
-            Selector.Register();
         }
 
         public static void SetGameState(GameState state)

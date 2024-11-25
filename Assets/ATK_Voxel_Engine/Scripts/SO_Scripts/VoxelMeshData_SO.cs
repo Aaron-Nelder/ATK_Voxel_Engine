@@ -86,6 +86,7 @@ namespace ATKVoxelEngine
                 path = UnityEditor.EditorUtility.SaveFilePanelInProject("Save Mesh", "New Mesh", "asset", "Save Mesh");
                 if (path.Length == 0)
                     return null;
+                UnityEditor.AssetDatabase.CreateAsset(_mesh, path);
             }
 
             UnityEditor.EditorUtility.SetDirty(this);

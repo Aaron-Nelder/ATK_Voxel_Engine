@@ -24,7 +24,7 @@ namespace ATKVoxelEngine
         void Start()
         {
             //TODO:: Change this to a proper voxel / Inventory system
-            _heldVoxel = Instantiate(_heldVoxelPrefab, _heldAnchor).GetComponent<HeldVoxel>().Init(_heldAnchor, EngineSettings.VoxelAtlas[2]);
+            _heldVoxel = Instantiate(_heldVoxelPrefab, _heldAnchor).GetComponent<HeldVoxel>().Init(_heldAnchor, EngineSettings.GetVoxelData(VoxelType.STONE));
 
             _breakSpeed = PlayerManager.Instance.Stats.BreakSpeed;
             _placeSpeed = PlayerManager.Instance.Stats.PlaceSpeed;
@@ -38,7 +38,7 @@ namespace ATKVoxelEngine
             {
                 if (_breakTimer >= _breakSpeed)
                 {
-                    EngineUtilities.DestroyVoxel(EngineUtilities.LocalPosToWorldPos(Selector.SelectedVoxel.Chunk.Position, Selector.SelectedVoxel.LocalPosition));
+                    EngineUtilities.DestroyVoxel(EngineUtilities.LocalPosToWorldPos(Selector.SelectedVoxel.Chunk.Data.Position, Selector.SelectedVoxel.LocalPosition));
                     _breakTimer = 0;
                 }
                 else
@@ -46,9 +46,9 @@ namespace ATKVoxelEngine
             }
             else if (_isRightClick && Selector.HasSelection)
             {
+                _animator.SetBool(_breakingHash, true);
                 if (_placeTimer >= _placeSpeed)
                 {
-                    _animator.SetBool(_breakingHash, true);
                     EngineUtilities.PlaceVoxel(Selector.SelectedVoxel.NormalWorldPos, _heldVoxel.Id);
                     _placeTimer = 0;
                 }
@@ -58,7 +58,7 @@ namespace ATKVoxelEngine
             else if (_isRightClick && !Selector.HasSelection)
             {
                 _animator.SetBool(_breakingHash, false);
-                _placeTimer = _placeSpeed;
+                //_placeTimer = _placeSpeed;
             }
         }
 
@@ -76,13 +76,11 @@ namespace ATKVoxelEngine
         void OnRightClick(InputValue value)
         {
             _isRightClick = value.isPressed;
-
             _placeTimer = _placeSpeed;
 
             if (_isRightClick)
                 _isLeftClick = false;
-
-            if (!_isRightClick)
+            else
                 _animator.SetBool(_breakingHash, false);
         }
     }

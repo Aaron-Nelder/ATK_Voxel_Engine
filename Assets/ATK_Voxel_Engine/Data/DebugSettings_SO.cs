@@ -41,12 +41,4 @@ namespace ATKVoxelEngine
         public PreviewType previewType;
         public Color color;
     }
-
-    public enum PreviewType
-    {
-        WireCube,
-        WireSphere,
-        Line,
-        DashLine,
-    }
 }

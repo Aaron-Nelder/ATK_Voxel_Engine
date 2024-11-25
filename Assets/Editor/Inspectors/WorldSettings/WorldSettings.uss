@@ -25,7 +25,7 @@
     font-size: 20px;
     -unity-font-style: normal;
     -unity-text-align: middle-left;
-    white-space: normal;
-    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-overflow: clip;
     -unity-font-definition: url("project://database/Assets/ATK_Voxel_Engine/Fonts/PerfectDOSVGA437.ttf?fileID=12800000&guid=bf3877327f1efc64cbec8f1c14e20eb3&type=3#PerfectDOSVGA437");
 }

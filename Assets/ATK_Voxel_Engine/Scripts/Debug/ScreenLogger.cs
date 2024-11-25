@@ -13,10 +13,12 @@ namespace ATKVoxelEngine
         static VisualElement _logContainer;
         static Stack<ScreenLog> _logPool = new Stack<ScreenLog>();
         static Queue<ScreenLog> _logQueue = new Queue<ScreenLog>();
+        static bool isInitialized = false;
 
         public ScreenLogger(UIDocument doc)
         {
             AddLabels(doc);
+            isInitialized = true;
         }
 
         public static void AddToStack(ScreenLog log)
@@ -67,6 +69,7 @@ namespace ATKVoxelEngine
         #region Loggers
         public static void Log(LogType logType, object message)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(logType));
@@ -76,6 +79,7 @@ namespace ATKVoxelEngine
 
         public static void Log(LogType logType, object message, UnityEngine.Object context)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(logType));
@@ -85,6 +89,7 @@ namespace ATKVoxelEngine
 
         public static void Log(LogType logType, string tag, object message)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(logType));
@@ -94,6 +99,7 @@ namespace ATKVoxelEngine
 
         public static void Log(LogType logType, string tag, object message, UnityEngine.Object context)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(logType));
@@ -103,6 +109,7 @@ namespace ATKVoxelEngine
 
         public static void Log(object message)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Log));
@@ -112,6 +119,7 @@ namespace ATKVoxelEngine
 
         public static void Log(string tag, object message)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Log));
@@ -121,6 +129,7 @@ namespace ATKVoxelEngine
 
         public static void Log(string tag, object message, UnityEngine.Object context)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Log));
@@ -130,6 +139,7 @@ namespace ATKVoxelEngine
 
         public static void LogWarning(string tag, object message)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Warning));
@@ -139,6 +149,7 @@ namespace ATKVoxelEngine
 
         public static void LogWarning(string tag, object message, UnityEngine.Object context)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Warning));
@@ -148,6 +159,7 @@ namespace ATKVoxelEngine
 
         public static void LogError(string tag, object message)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Error));
@@ -157,6 +169,7 @@ namespace ATKVoxelEngine
 
         public static void LogError(string tag, object message, UnityEngine.Object context)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Error));
@@ -166,6 +179,7 @@ namespace ATKVoxelEngine
 
         public static void LogException(Exception exception)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Exception));
@@ -175,6 +189,7 @@ namespace ATKVoxelEngine
 
         public static void LogException(Exception exception, UnityEngine.Object context)
         {
+            if (!isInitialized) return;
             ScreenLog freeLog = GetFreeLog();
             freeLog.Label.ClearClassList();
             freeLog.Label.AddToClassList(GetStyle(LogType.Exception));

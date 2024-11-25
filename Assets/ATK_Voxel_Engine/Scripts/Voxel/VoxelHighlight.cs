@@ -59,7 +59,7 @@ namespace ATKVoxelEngine
 
             _selectedVoxel = newVoxel;
 
-            int3 pos = EngineUtilities.LocalPosToWorldPos(_selectedVoxel.Chunk.Position, _selectedVoxel.LocalPosition);
+            int3 pos = EngineUtilities.LocalPosToWorldPos(_selectedVoxel.Chunk.Data.Position, _selectedVoxel.LocalPosition);
             _transformMatrix = Matrix4x4.identity;
             _transformMatrix.m03 = pos.x;
             _transformMatrix.m13 = pos.y;

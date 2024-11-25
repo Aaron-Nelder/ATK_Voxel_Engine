@@ -1,15 +1,11 @@
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace ATKVoxelEngine
 {
-    public class DebugHud : MonoBehaviour
+    public class DebugHud : ITickable
     {
-        [Tooltip("How times per sceond the elemnts update")]
-        [SerializeField] float _updateTime = 1f;
-        float UpdateTime => 1 / _updateTime;
-        float _tick;
-        public bool Initialized { get; private set; }
+        public TickType TickType => TickType.FIXED_UPDATE;
+        public bool Registered { get; private set; }
 
         Label _fps;
         Label _playerChunk;
@@ -21,7 +17,7 @@ namespace ATKVoxelEngine
         Label _GPUTime;
         Label _Batches;
 
-        public void Init(UIDocument hudDocument)
+        public DebugHud(UIDocument hudDocument)
         {
             _fps = hudDocument.rootVisualElement.Q<Label>("FPS");
             _playerChunk = hudDocument.rootVisualElement.Q<Label>("PlayerChunk");
@@ -32,22 +28,23 @@ namespace ATKVoxelEngine
             _CPUTime = hudDocument.rootVisualElement.Q<Label>("CPUTime");
             _GPUTime = hudDocument.rootVisualElement.Q<Label>("GPUTime");
             _Batches = hudDocument.rootVisualElement.Q<Label>("Batches");
-            Initialized = true;
+            Register();
         }
 
-        void OnEnable()
+        public void Register()
         {
-            _tick = UpdateTime;
+            TickRateManager.OnFixedUpdate += Tick;
+            Registered = true;
         }
 
-        void FixedUpdate()
+        public void UnRegister()
         {
-            if (!Initialized) return;
+            TickRateManager.OnFixedUpdate -= Tick;
+            Registered = false;
+        }
 
-            _tick += Time.deltaTime;
-
-            if (_tick < UpdateTime) return;
-
+        public void Tick(float deltaTime)
+        {
             if (EngineSettings.DebugSettings.gameShowFPS)
                 _fps.text = DebugHelper.FPS;
 
@@ -71,8 +68,6 @@ namespace ATKVoxelEngine
 
             if (EngineSettings.DebugSettings.gameShowBatches)
                 _Batches.text = $"Batches: {DebugHelper.Batches}";
-
-            _tick = 0;
         }
     }
 }

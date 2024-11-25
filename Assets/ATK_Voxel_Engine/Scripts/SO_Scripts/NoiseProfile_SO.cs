@@ -6,8 +6,14 @@ namespace ATKVoxelEngine
     [CreateAssetMenu(fileName = "Noise Profile", menuName = EngineConstants.ENGINE_NAME + "/Noise Profile")]
     public class NoiseProfile_SO : ScriptableObject
     {
-        [SerializeField] float _scale = 200.0f;
-        public float Scale => _scale;
+        [SerializeField] NoiseDimension _dimension = NoiseDimension.TWO_D;
+        public NoiseDimension Dimension => _dimension;
+
+        [SerializeField] NoiseType _type = NoiseType.PERLIN;
+        public NoiseType Type => _type;
+
+        [SerializeField] float3 _scale = new(1, 1, 1);
+        public float3 Scale => _scale;
 
         [SerializeField] float _amplitude = 1.0f;
         public float Amplitude => _amplitude;
@@ -21,11 +27,14 @@ namespace ATKVoxelEngine
         [SerializeField] float _lacunarity = 2.0f;
         public float Lacunarity => _lacunarity;
 
-        [SerializeField] float _persistance = 0.5f;
-        public float Persistance => _persistance;
+        [SerializeField] float _persistence = 0.5f;
+        public float Persistence => _persistence;
 
-        [SerializeField] uint _magClamp = 1;
-        public uint MagClamp => _magClamp;
+        [SerializeField] float _rotation = 0;
+        public float Rotation => _rotation;
+
+        [SerializeField] uint _multiplier = 1;
+        public uint Multiplier => _multiplier;
 
         [SerializeField] bool _useThreshold = false;
         public bool UseThreshold => _useThreshold;

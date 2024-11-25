@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6072869520779313557}
   - component: {fileID: 7432178006857484051}
-  - component: {fileID: 1070503909706189678}
   - component: {fileID: 971666930541302982}
   m_Layer: 0
   m_Name: Engine Manager
@@ -47,21 +46,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Pool>k__BackingField: {fileID: 971666930541302982}
---- !u!114 &1070503909706189678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8853718352198367447}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb91ee6f358db0749a84346d70a69351, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tickRate: 10
-  runOnce: 0
-  alwaysRun: 0
 --- !u!114 &971666930541302982
 MonoBehaviour:
   m_ObjectHideFlags: 0

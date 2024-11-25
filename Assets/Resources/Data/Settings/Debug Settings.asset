@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Debug Settings
   m_EditorClassIdentifier: 
   showEditorInGameMode: 1
-  editorShowFPS: 1
-  editorShowActiveChunks: 1
-  editorShowPlayerChunk: 1
-  editorShowPlayerPos: 1
+  editorShowFPS: 0
+  editorShowActiveChunks: 0
+  editorShowPlayerChunk: 0
+  editorShowPlayerPos: 0
   editorShowCameraChunk: 1
   editorShowCameraPos: 1
-  editorShowCPUTime: 1
-  editorShowGPUTime: 1
-  editorShowBatches: 1
+  editorShowCPUTime: 0
+  editorShowGPUTime: 0
+  editorShowBatches: 0
   gameShowFPS: 1
   gameShowPlayerChunk: 1
   gameShowPlayerPos: 1

@@ -24,7 +24,6 @@ public class PlayerManager : MonoBehaviour
             case GameState.LOADING:
                 MotionHandler.Rigidbody.isKinematic = true;
                 MotionHandler.Rigidbody.useGravity = false;
-                Debug.Log("PlayerManager: Loading");
                 break;
             case GameState.PLAYING:
                 MotionHandler.Rigidbody.isKinematic = false;
@@ -32,7 +31,7 @@ public class PlayerManager : MonoBehaviour
                 PlayerHelper.SnapPlayerToVoxel(ChunkManager.Chunks[new(0, 0)], EngineSettings.WorldSettings.ChunkSize.x / 2, EngineSettings.WorldSettings.ChunkSize.z / 2);
                 MotionHandler.Init(Stats);
                 HUD.Initialize();
-                Debug.Log("PlayerManager: PLAYING");
+                Selector.Register();
                 break;
             case GameState.EDITOR:
                 break;
